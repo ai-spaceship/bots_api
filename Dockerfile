@@ -17,4 +17,4 @@ ENV PORT=8080
 
 RUN prisma generate
 # 
-CMD ["uvicorn", "main:app", "--port", "8080"]
+CMD exec gunicorn --bind :$PORT --workers 2 --timeout 0  --worker-class uvicorn.workers.UvicornWorker  --threads 8 main:app
