@@ -20,12 +20,12 @@ def check_user_in_matrix(userid):
         print(error_data)
         return False
 
-def register_bot(username,password,display_name):
+def register_bot(username,password,display_name,device_id):
     body = {
         "auth": {
             "type": "m.login.dummy"
         },
-        "device_id": "chatgptbot",
+        "device_id": device_id,
         "initial_device_display_name": display_name,
         "password": password,
         "username": username
