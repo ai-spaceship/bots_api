@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 # 
 COPY . /code
 
-ENV PORT=8080
+ENV PORT=80
 
 RUN prisma generate
 # 

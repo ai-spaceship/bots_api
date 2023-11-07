@@ -6,6 +6,20 @@ from prisma import Prisma
 app = FastAPI()
 prisma = Prisma()
 
+origins = [
+    "https://multi.so",
+    "https://super.multi.so"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 class Item(BaseModel):
     link: str
     name: str
