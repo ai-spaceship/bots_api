@@ -17,4 +17,4 @@ ENV PORT=80
 
 RUN prisma generate
 # 
-CMD exec gunicorn --bind :$PORT --workers 2 --timeout 0  --worker-class uvicorn.workers.UvicornWorker  --threads 8 main:app
+CMD exec gunicorn --bind :$PORT --workers 2 --timeout 0  --worker-class uvicorn.workers.UvicornWorker --log-level debug --threads 8 main:app

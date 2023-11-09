@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Path
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from prisma import Prisma
@@ -21,7 +22,6 @@ app.add_middleware(
 
 
 class Item(BaseModel):
-    link: str
     name: str
 
 class UserCreate(BaseModel):
@@ -40,9 +40,7 @@ async def shutdown():
 async def add_item(item: Item,username: str = Path(..., title="The username", description="Username of the user")):
     user = await prisma.post.create({
         'username': username,
-        "link": item.link,
-        "link_agent": "Flowise" if "flow.immagine.ai" in item.link else "Superagent",
-        "name" : item.name
+        'bot_username' : item.name
     })
     if user:
         return True

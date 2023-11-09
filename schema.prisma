@@ -15,7 +15,5 @@ model Post {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   username   String
-  link       String
-  link_agent String
-  name       String
+  bot_username       String
 }

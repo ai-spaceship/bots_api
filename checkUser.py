@@ -1,6 +1,6 @@
 import requests
 
-MATRIX_API_URL = "https://matrix.immagine.ai"
+MATRIX_API_URL = "https://matrix.multi.so"
 
 def check_user_in_matrix(userid):
     # Replace with your actual access token
