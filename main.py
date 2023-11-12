@@ -22,7 +22,12 @@ app.add_middleware(
 
 
 class Item(BaseModel):
-    name: str
+    username: str
+    bot_username: str
+    api_key: str
+    agent_name: str
+    agent_desc: str
+    profile: str
 
 class UserCreate(BaseModel):
     username: str
@@ -36,11 +41,15 @@ async def shutdown():
     await prisma.disconnect()
 
 
-@app.post("/{username}/add")
-async def add_item(item: Item,username: str = Path(..., title="The username", description="Username of the user")):
+@app.post("/add")
+async def add_item(item: Item):
     user = await prisma.post.create({
-        'username': username,
-        'bot_username' : item.name
+        'username': item.username,
+        'bot_username' : item.bot_username,
+        'api_key' : item.api_key,
+        'agent_name' : item.agent_name,
+        'agent_desc' : item.agent_desc,
+        'profile_photo' : item.profile
     })
     if user:
         return True
@@ -53,7 +62,8 @@ async def delete_item(item: Item,username: str = Path(..., title="The username",
     items = await prisma.post.delete(where={
         'id': username
     })
-    return items
+    if item:
+      return items
     raise HTTPException(status_code=404, detail="Item not found")
 
 @app.get("/list/{username}")

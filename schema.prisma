@@ -16,4 +16,9 @@ model Post {
   updated_at DateTime @updatedAt
   username   String
   bot_username       String
+  api_key    String
+  agent_name String
+  agent_desc String
+  profile_photo String
+
 }
