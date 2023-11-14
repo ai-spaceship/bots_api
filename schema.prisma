@@ -19,6 +19,6 @@ model Post {
   api_key    String
   agent_name String
   agent_desc String
-  profile_photo String
+  profile_photo String?
 
 }

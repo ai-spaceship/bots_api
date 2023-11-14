@@ -15,6 +15,6 @@ COPY . /code
 
 ENV PORT=80
 
-RUN prisma generate
+RUN prisma db push
 # 
 CMD exec gunicorn --bind :$PORT --workers 2 --timeout 0  --worker-class uvicorn.workers.UvicornWorker --log-level debug --threads 8 main:app
