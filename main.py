@@ -57,9 +57,9 @@ async def add_item(item: Item):
     if reg_result:
         env_vars = {
             "HOMESERVER": "https://matrix.multi.so",
-            "USER_ID": reg_result.user_id,
+            "USER_ID": reg_result['user_id'],
             "PASSWORD": password,
-            "DEVICE_ID": reg_result.device_id,
+            "DEVICE_ID": reg_result['device_id'],
             "SUPERAGENT_URL": "https://api.multi.so",
             "AGENT_ID": item.agent_id,
             "API_KEY": item.api_key

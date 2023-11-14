@@ -35,5 +35,6 @@ def register_bot(username,password,display_name,device_id):
         return False
 
 if __name__ == "__main__":
-    res = register_bot("plate","Alohomora","Plate","plate_device")
+    password = generatePassword(10)
+    res = register_bot("plates",password,"Plate","plate_device")
     print(res)
