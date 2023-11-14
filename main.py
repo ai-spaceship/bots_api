@@ -28,7 +28,7 @@ class Item(BaseModel):
     api_key: str
     agent_name: str
     agent_desc: str
-    profile: str | None
+    profile: str
 
 class UserCreate(BaseModel):
     username: str
