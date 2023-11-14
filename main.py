@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from prisma import Prisma
+from prisma.partials import Bots
 
 app = FastAPI()
 prisma = Prisma()
@@ -68,7 +69,7 @@ async def delete_item(item: Item,username: str = Path(..., title="The username",
 
 @app.get("/list/{username}")
 async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
-    items = await prisma.post.find_many(where={
+    items = await Bots.prisma().find_many(where={
         'username' : username
     })
     if not items:
