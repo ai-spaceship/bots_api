@@ -29,10 +29,11 @@ def register_bot(username,password,display_name,device_id):
     }
     url = f"{MATRIX_API_URL}/_matrix/client/v3/register"
     response = requests.post(url, json=body)
+    print(response.json())
     if (response.status_code == 200) :
         return response.json()
     else:
-        return False
+        return {"status" : response.status_code}
 
 if __name__ == "__main__":
     password = generatePassword(10)

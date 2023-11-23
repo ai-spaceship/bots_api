@@ -9,13 +9,13 @@ COPY ./requirements.txt /code/requirements.txt
 
 #
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir  requests matrix-nio[e2e] boto3 fastapi gunicorn uvicorn prisma
 
 # 
 COPY . /code
 
 ENV PORT=80
 
-RUN prisma db push
+RUN prisma generate
 # 
 CMD exec gunicorn --bind :$PORT --workers 2 --timeout 0  --worker-class uvicorn.workers.UvicornWorker --log-level debug --threads 8 main:app

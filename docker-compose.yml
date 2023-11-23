@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  my_pony_client_container:
+    image: agifm/bots_api
+    container_name: japi
+    env_file:
+      - .env
+    ports:
+      - "8098:80"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self' *.multi.so"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Permission-Policy=interest-cohort=()"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Access-Control-Allow-Origin=*"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
+      - "traefik.http.routers.japi.entrypoints=web-secure"
+      - "traefik.http.routers.japi.middlewares=japi-add-headers"
+      - "traefik.http.routers.japi.rule=Host(`bots.multi.so`)"
+      - "traefik.http.routers.japi.service=japi"
+      - "traefik.http.routers.japi.tls=true"
+      - "traefik.http.routers.japi.tls.certresolver=default"
+      - "traefik.http.services.japi.loadbalancer.server.port=80"
+
+networks:
+  traefik:
+    external:
+      name: traefik
