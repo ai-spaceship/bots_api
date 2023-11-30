@@ -102,6 +102,8 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 @app.get("/list/{username}")
 async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
     get_email = get_email_from_username(username)
+    if get_email is None:
+        return []
     items = await prisma.post.find_many(where={
         'username': get_email
     })
