@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from prisma import Prisma
 
 from utils.deployBot import start_ecs_task
-from utils.createBot import register_bot, generatePassword
+from utils.createBot import get_email_from_username, register_bot, generatePassword
 
 app = FastAPI()
 prisma = Prisma()
@@ -101,8 +101,9 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 @app.get("/list/{username}")
 async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
+    get_email = get_email_from_username(username)
     items = await prisma.post.find_many(where={
-        'username': username
+        'username': get_email
     })
     if not items:
         raise HTTPException(status_code=404, detail="List is empty")

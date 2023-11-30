@@ -1,17 +1,14 @@
 import requests
 import random
+import os
 
 MATRIX_API_URL = "https://matrix.multi.so"
 
 def generatePassword(n):
-    # defining the list of choices of characters.
     characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
-
-    # initializing an empty string to store the password.
     password = ""
 
     for i in range(n):
-        # randomly selecting one character and appending it to the resultant password string
         password += random.choice(characters)
 
     # finally returning the randomly generated password.
@@ -34,8 +31,19 @@ def register_bot(username,password,display_name,device_id):
         return response.json()
     else:
         return {"status" : response.status_code}
+    
+def get_email_from_username(username):
+    auth_token = os.environ["AUTH_TOKEN"]
+    headers = {"Authorization": f"Bearer {auth_token}"}
+    req = requests.get(f'{MATRIX_API_URL}/_synapse/admin/v2/users/{username}', headers=headers)
+    data = req.json()
+    if data["threepids"] is not []:
+        return data["threepids"][0]["address"]
+    return None
 
 if __name__ == "__main__":
-    password = generatePassword(10)
-    res = register_bot("plates",password,"Plate","plate_device")
+    #password = generatePassword(10)
+    #res = register_bot("plates",password,"Plate","plate_device")
+    #print(res)
+    res = get_email_from_username("@jasmindreasond=40skiff.com:multi.so")
     print(res)
