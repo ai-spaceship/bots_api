@@ -36,9 +36,10 @@ def get_email_from_username(username):
     auth_token = os.environ["AUTH_TOKEN"]
     headers = {"Authorization": f"Bearer {auth_token}"}
     req = requests.get(f'{MATRIX_API_URL}/_synapse/admin/v2/users/{username}', headers=headers)
-    data = req.json()
-    if data["threepids"] is not []:
-        return data["threepids"][0]["address"]
+    if req.status_code == 200:
+        data = req.json()
+        if data["threepids"] is not []:
+            return data["threepids"][0]["address"]
     return None
 
 if __name__ == "__main__":
