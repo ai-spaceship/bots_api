@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from prisma import Prisma
 
 from utils.deployBot import start_ecs_task
-from utils.createBot import get_email_from_username, register_bot, generatePassword
+from utils.createBot import get_access_token, get_email_from_username, register_bot, generatePassword
 
 app = FastAPI()
 prisma = Prisma()
@@ -27,7 +27,7 @@ app.add_middleware(
 
 
 class Item(BaseModel):
-    username: str
+    email_id: str
     bot_username: str
     api_key: str
     agent_name: str
@@ -75,13 +75,17 @@ async def add_item(item: Item):
 
         deploy_bot = start_ecs_task(env_vars)
         logging.info(deploy_bot)
-        user = await prisma.post.create({
+        await prisma.user.create({
             'username': item.username,
-            'bot_username': item.bot_username,
+            'bot_username': reg_result['user_id'],
+            'password' : password,
             'api_key': item.api_key,
+            'agent_id': item.agent_id,
+            'email_id': item.email_id,
             'agent_name': item.agent_name,
             'agent_desc': item.agent_desc,
-            'profile_photo': item.profile if item.profile else ""
+            'profile_photo': item.profile if item.profile else "",
+            'access_token' : get_access_token(password)
         })
         return {"status" : "created","user_id": reg_result}
     except Exception as e:
@@ -91,7 +95,7 @@ async def add_item(item: Item):
 
 @app.delete("/list/{username}/del")
 async def delete_item(item: Item, username: str = Path(..., title="The username", description="Username of the user")):
-    items = await prisma.post.delete(where={
+    items = await prisma.user.delete(where={
         'id': username
     })
     if item:
@@ -103,11 +107,20 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
     get_email = get_email_from_username(username)
     if get_email is not None:
-        items = await prisma.post.find_many(where={
+        items = await prisma.user.find_many(where={
             'username': get_email
         })
         return items
     return []
+
+@app.get("/agents/{agent_id}")
+async def get_bot(agent_id):
+    get_bot = await prisma.user.find_first(
+        where= {
+            "agent_id" : agent_id
+        }
+    )
+    return get_bot
 
 
 @app.get('/get_list/enterprise')

@@ -42,6 +42,20 @@ def get_email_from_username(username):
             return data["threepids"][0]["address"]
     return None
 
+def get_access_token():
+    body= {
+    "identifier": { "type": "m.id.user", "user": "@admin:multi.so" },
+  
+    "password": "Ho7JWitW1QzoWVS",
+  
+    "type": "m.login.password",
+    "device_id": "deployer"
+    }
+    url = f"{MATRIX_API_URL}/_matrix/client/r0/login"
+    response = requests.post(url, json=body)
+    if response.status_code == 200:
+        return response.json()['access_token']
+
 if __name__ == "__main__":
     #password = generatePassword(10)
     #res = register_bot("plates",password,"Plate","plate_device")
