@@ -85,7 +85,7 @@ async def add_item(item: Item):
             'agent_name': item.agent_name,
             'agent_desc': item.agent_desc,
             'profile_photo': item.profile if item.profile else "",
-            'access_token' : get_access_token(password)
+            'access_token' : get_access_token(reg_result['user_id'],password)
         })
         return {"status" : "created","user_id": reg_result}
     except Exception as e:

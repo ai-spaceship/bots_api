@@ -2,7 +2,7 @@ import requests
 import random
 import os
 
-MATRIX_API_URL = "https://matrix.multi.so"
+MATRIX_API_URL = "https://matrix.agispace.co"
 
 def generatePassword(n):
     characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
@@ -42,11 +42,11 @@ def get_email_from_username(username):
             return data["threepids"][0]["address"]
     return None
 
-def get_access_token():
+def get_access_token(username,password):
     body= {
-    "identifier": { "type": "m.id.user", "user": "@admin:multi.so" },
+    "identifier": { "type": "m.id.user", "user": username },
   
-    "password": "Ho7JWitW1QzoWVS",
+    "password": password,
   
     "type": "m.login.password",
     "device_id": "deployer"
@@ -55,10 +55,3 @@ def get_access_token():
     response = requests.post(url, json=body)
     if response.status_code == 200:
         return response.json()['access_token']
-
-if __name__ == "__main__":
-    #password = generatePassword(10)
-    #res = register_bot("plates",password,"Plate","plate_device")
-    #print(res)
-    res = get_email_from_username("@jasmindreasond=40skiff.com:multi.so")
-    print(res)
