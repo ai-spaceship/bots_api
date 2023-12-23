@@ -1,2 +1,2 @@
 # bots_api
-bots.multi.so
+bots.agispace.co

@@ -13,8 +13,8 @@ app = FastAPI()
 prisma = Prisma()
 
 origins = [
-    "https://multi.so",
-    "https://super.multi.so"
+    "https://agispace.co",
+    "https://super.agispace.co"
 ]
 
 app.add_middleware(
@@ -64,11 +64,11 @@ async def add_item(item: Item):
             item.bot_username, password, item.bot_username, f"superagent_{item.agent_name}")
         logging.info(reg_result)
         env_vars = {
-                "HOMESERVER": "https://matrix.multi.so",
+                "HOMESERVER": "https://matrix.agispace.co",
                 "USER_ID": reg_result['user_id'],
                 "PASSWORD": password,
                 "DEVICE_ID": reg_result['device_id'],
-                "SUPERAGENT_URL": "https://api.multi.so",
+                "SUPERAGENT_URL": "https://api.agispace.co",
                 "AGENT_ID": item.agent_id,
                 "API_KEY": item.api_key
         }
@@ -134,14 +134,14 @@ async def get_list():
                     "title": "Finance",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_finance:immagine.ai",
+                            "bot_id": "@bot_finance:agispace.co",
                             "bot_name": "FinanceBot",
                             "description": "An enterprise finance bot for real-time financial analysis."
                         }
                     ],
                     "popular_rooms" : [
                         {
-                            "room_id" : "#trading:multi.so",
+                            "room_id" : "#trading:agispace.co",
                             "room_name" : "Trading",
                             "description" : "A room for aspiring traders."
                         }
@@ -151,14 +151,14 @@ async def get_list():
                     "title": "Productivity",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_productivity:immagine.ai",
+                            "bot_id": "@bot_productivity:agispace.co",
                             "bot_name": "ProductivityBot",
                             "description": "Boost your team's productivity with task management and reminders."
                         }
                     ],
                     "popular_rooms" : [
                         {
-                            "room_id" : "#Pomodoro:multi.so",
+                            "room_id" : "#Pomodoro:agispace.co",
                             "room_name" : "Pomodoro",
                             "description" : "A room for Productivity enthusiasts."
                         }
@@ -184,14 +184,14 @@ async def get_list():
                     "title": "Entertainment",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_entertainment:immagine.ai",
+                            "bot_id": "@bot_entertainment:agispace.co",
                             "bot_name": "TriviaBot",
                             "description": "Challenge yourself with fun trivia questions and quizzes."
                         }
                     ],
                     "popular_rooms" : [
                         {
-                            "room_id" : "#Music:multi.so",
+                            "room_id" : "#Music:agispace.co",
                             "room_name" : "Music",
                             "description" : "A room for music lovers."
                         }
@@ -201,14 +201,14 @@ async def get_list():
                     "title": "Language",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_language:immagine.ai",
+                            "bot_id": "@bot_language:agispace.co",
                             "bot_name": "TranslatorBot",
                             "description": "Translate between languages with ease using this bot."
                         }
                     ],
                     "popular_rooms" : [
                         {
-                            "room_id" : "#Klingon:multi.so",
+                            "room_id" : "#Klingon:agispace.co",
                             "room_name" : "Klingon",
                             "description" : "Learn Klingon with AI bots."
                         }

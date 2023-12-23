@@ -52,11 +52,11 @@ def start_ecs_task(env_vars, region_name='us-east-1'):
 if __name__ == "__main__":
 # Example usage:
     env_vars = {
-        "HOMESERVER": "https://matrix.multi.so",
-        "USER_ID": "@example:multi.so",
+        "HOMESERVER": "https://matrix.agispace.co",
+        "USER_ID": "@example:agispace.co",
         "PASSWORD": "matrix bot password",
         "DEVICE_ID": "device_id",
-        "SUPERAGENT_URL": "api.multi.so",
+        "SUPERAGENT_URL": "api.agispace.co",
         "AGENT_ID": "enter superagent agent id here",
         "API_KEY": "enter api key here"
     }

@@ -12,7 +12,7 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self' *.multi.so"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self' *.agispace.co"
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Permission-Policy=interest-cohort=()"
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
@@ -21,7 +21,7 @@ services:
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.X-XSS-Protection=1; mode=block"
       - "traefik.http.routers.japi.entrypoints=web-secure"
       - "traefik.http.routers.japi.middlewares=japi-add-headers"
-      - "traefik.http.routers.japi.rule=Host(`bots.multi.so`)"
+      - "traefik.http.routers.japi.rule=Host(`bots.agispace.co`)"
       - "traefik.http.routers.japi.service=japi"
       - "traefik.http.routers.japi.tls=true"
       - "traefik.http.routers.japi.tls.certresolver=default"
