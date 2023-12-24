@@ -35,6 +35,11 @@ class Item(BaseModel):
     agent_id: str
     profile: str
 
+class Users(BaseModel):
+    email_id: str
+    bot_username: str
+    agent_name: str
+
 
 class UserCreate(BaseModel):
     username: str
@@ -104,11 +109,11 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 
 @app.get("/list/{username}")
-async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
+async def get_list(username: str = Path(..., title="The username", description="Username of the user")) -> list[Users]:
     get_email = get_email_from_username(username)
     if get_email is not None:
         items = await prisma.user.find_many(where={
-            'username': get_email
+            'email_id': get_email
         })
         return items
     return []
