@@ -2,12 +2,13 @@ import logging
 
 from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+
 
 from prisma import Prisma
 
 from utils.deployBot import start_ecs_task
 from utils.createBot import get_access_token, get_email_from_username, register_bot, generatePassword
+from models import Item, Users
 
 app = FastAPI()
 prisma = Prisma()
@@ -26,23 +27,7 @@ app.add_middleware(
 )
 
 
-class Item(BaseModel):
-    email_id: str
-    bot_username: str
-    api_key: str
-    agent_name: str
-    agent_desc: str
-    agent_id: str
-    profile: str
 
-class Users(BaseModel):
-    email_id: str
-    bot_username: str
-    agent_name: str
-
-
-class UserCreate(BaseModel):
-    username: str
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -127,6 +112,28 @@ async def get_bot(agent_id):
     )
     return get_bot
 
+@app.get('/list')
+async def bots_list(tag: str = None):
+    if tag is None:
+        data = await prisma.bots.find_many(
+            include= {
+                'meta' : True
+            }
+        )
+    else:
+        data = await prisma.bots.find_first(
+            where = {
+                'meta': {
+                        'tags' : {
+                            'has_every' : [tag]
+                        }
+                }
+            },
+            include= {
+                'meta' : True
+            }
+        )
+    return data
 
 @app.get('/get_list/enterprise')
 async def get_list():

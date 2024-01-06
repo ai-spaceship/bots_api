@@ -1,7 +1,7 @@
 datasource db {
   // could be postgresql or mysql
-  provider = "sqlite"
-  url      = "file:dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator db {
@@ -11,17 +11,56 @@ generator db {
 }
 
 model User {
-  id               String   @id @default(cuid())
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-  username         String
-  email_id         String
-  bot_username     String
-  password         String
-  api_key          String
-  agent_name       String
-  agent_desc       String
-  agent_id         String
-  profile_photo    String?
-  access_token     String
+  id            String   @id @default(cuid())
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  username      String
+  email_id      String
+  bot_username  String
+  password      String
+  api_key       String
+  agent_name    String
+  agent_desc    String
+  agent_id      String
+  profile_photo String?
+  access_token  String
+}
+
+enum Tag {
+  code
+  writing
+  typescript
+  Writing
+  productivity
+  prompt
+  translation
+  programming
+  academic
+  research
+  softwareDevelopment
+  userExperience
+  designer
+  documentation
+  softwareDevelopment2
+  react
+  game
+  it
+  frontend
+  creative
+}
+
+model Meta {
+  id          Int    @id @default(autoincrement())
+  description String
+  tags        Tag[]
+  avatar      String
+  Bots        Bots[]
+}
+
+model Bots {
+  id       Int    @id @default(autoincrement())
+  username String
+  room_id  String
+  meta     Meta   @relation(fields: [metaId], references: [id])
+  metaId   Int
 }
