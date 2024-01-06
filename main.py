@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 from prisma import Prisma
+from config import TAG_MAPPING
 
 from utils.deployBot import start_ecs_task
 from utils.createBot import get_access_token, get_email_from_username, register_bot, generatePassword
@@ -117,7 +118,7 @@ async def bots_list(tag: str = None):
     if tag is None:
         data = await prisma.bots.find_many(
             include= {
-                'meta' : True
+                'meta' : True,
             }
         )
     else:
@@ -133,7 +134,7 @@ async def bots_list(tag: str = None):
                 'meta' : True
             }
         )
-    return data
+    return [TAG_MAPPING ,data]
 
 @app.get('/get_list/enterprise')
 async def get_list():
