@@ -52,7 +52,7 @@ enum Tag {
 model Meta {
   id          Int    @id @default(autoincrement())
   description String
-  tags        Tag[]
+  tags        String[]
   avatar      String
   Bots        Bots[]
 }
