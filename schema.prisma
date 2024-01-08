@@ -50,16 +50,19 @@ enum Tag {
 }
 
 model Meta {
-  id          Int    @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   description String
   tags        String[]
   avatar      String
+  title       String
   Bots        Bots[]
 }
 
 model Bots {
   id       Int    @id @default(autoincrement())
   username String
+  author   String
+  identifier String
   room_id  String
   meta     Meta   @relation(fields: [metaId], references: [id])
   metaId   Int
