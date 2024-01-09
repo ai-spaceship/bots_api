@@ -14,10 +14,7 @@ from models import Item, Users
 app = FastAPI()
 prisma = Prisma()
 
-origins = [
-    "https://agispace.co",
-    "https://super.agispace.co"
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
