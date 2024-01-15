@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 class Item(BaseModel):
     email_id: str
+    username: str
     bot_username: str
     api_key: str
     agent_name: str
