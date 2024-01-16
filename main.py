@@ -64,7 +64,7 @@ async def add_item(item: Item):
         deploy_bot = start_ecs_task(env_vars)
         logging.info(deploy_bot)
         await prisma.user.create({
-            'username': item.username,
+            'username': "",
             'bot_username': reg_result['user_id'],
             'password' : password,
             'api_key': item.api_key,
