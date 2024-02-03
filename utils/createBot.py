@@ -2,7 +2,7 @@ import requests
 import random
 import os
 
-MATRIX_API_URL = "https://matrix.agispace.co"
+MATRIX_API_URL = "https://matrix.pixx.co"
 
 def generatePassword(n):
     characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789!@#$%^&*()"
@@ -36,8 +36,10 @@ def get_email_from_username(username):
     auth_token = os.environ["AUTH_TOKEN"]
     headers = {"Authorization": f"Bearer {auth_token}"}
     req = requests.get(f'{MATRIX_API_URL}/_synapse/admin/v2/users/{username}', headers=headers)
+    print(req.status_code)
     if req.status_code == 200:
         data = req.json()
+        print(data)
         if data["threepids"] is not []:
             return data["threepids"][0]["address"]
     return None

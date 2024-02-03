@@ -11,7 +11,7 @@ generator db {
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String   
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
   username      String
@@ -19,9 +19,9 @@ model User {
   bot_username  String
   password      String
   api_key       String
-  agent_name    String
-  agent_desc    String
-  agent_id      String
+  type          String
+  name          String
+  desc          String
   profile_photo String?
   access_token  String
 }
