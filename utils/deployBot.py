@@ -23,7 +23,7 @@ def start_ecs_task(env_vars, region_name='us-east-1'):
     environment = [{'name': key, 'value': str(value)} for key, value in env_vars.items()]
 
     cluster_name = "devCluster"
-    task_definition = "matrix_bot:3"
+    task_definition = "matrix_bot:4"
     launch_type = "FARGATE"
     network_configuration = {
         'awsvpcConfiguration': {
@@ -58,7 +58,8 @@ if __name__ == "__main__":
         "DEVICE_ID": "device_id",
         "SUPERAGENT_URL": "api.pixx.co",
         "AGENT_ID": "enter superagent agent id here",
-        "API_KEY": "enter api key here"
+        "API_KEY": "enter api key here",
+        "type" : "AGENT" # "WORKFLOW"
     }
 
     # Call the function with the example parameters

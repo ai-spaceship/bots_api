@@ -65,7 +65,7 @@ async def add_item(item: Item):
             'bot_username': reg_result['user_id'],
             'password' : password,
             'api_key': item.api_key,
-            'agent_id': item.agent_id,
+            'id': item.agent_id,
             'email_id': item.email_id,
             'name': item.agent_name,
             'desc': item.agent_desc,
@@ -139,7 +139,7 @@ async def get_list(username: str = Path(..., title="The username", description="
 async def get_bot(agent_id):
     get_bot = await prisma.user.find_first(
         where= {
-            "agent_id" : agent_id
+            "id" : agent_id
         }
     )
     return get_bot
