@@ -23,7 +23,7 @@ def start_ecs_task(env_vars, region_name='us-east-1'):
     environment = [{'name': key, 'value': str(value)} for key, value in env_vars.items()]
 
     cluster_name = "devCluster"
-    task_definition = "matrix_bot:4"
+    task_definition = "matrix_bot:5"
     launch_type = "FARGATE"
     network_configuration = {
         'awsvpcConfiguration': {
