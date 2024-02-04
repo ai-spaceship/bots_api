@@ -23,7 +23,7 @@ class WorkflowItem(BaseModel):
 class Users(BaseModel):
     email_id: str
     bot_username: str
-    agent_name: str
+    name: str
 
 
 class UserCreate(BaseModel):
