@@ -24,7 +24,7 @@ model User {
   desc          String
   profile_photo String?
   access_token  String
-  publish       String
+  publish       Boolean
   tags          String[]
 }
 

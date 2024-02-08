@@ -72,7 +72,9 @@ async def add_item(item: Item):
             'desc': item.agent_desc,
             'profile_photo': item.profile if item.profile else "",
             'access_token': get_access_token(reg_result['user_id'], password),
-            'type': "AGENT"
+            'type': "AGENT",
+            'publish': item.publish,
+            'tags' : item.tags.split(',')
         })
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
@@ -110,7 +112,9 @@ async def add_item(item: WorkflowItem):
             'desc': item.workflow_desc,
             'profile_photo': item.profile if item.profile else "",
             'access_token': get_access_token(reg_result['user_id'], password),
-            'type': "WORKFLOW"
+            'type': "WORKFLOW",
+            'publish': item.publish,
+            'tags' : item.tags.split(',')
         })
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
