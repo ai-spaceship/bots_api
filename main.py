@@ -9,7 +9,7 @@ from config import TAG_MAPPING
 
 from utils.deployBot import start_ecs_task
 from utils.createBot import get_access_token, get_email_from_username, register_bot, generatePassword
-from models import Item, Users, WorkflowItem
+from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
 
 app = FastAPI()
 prisma = Prisma()
@@ -23,6 +23,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -49,13 +50,13 @@ async def add_item(item: Item):
             item.bot_username, password, item.bot_username, f"superagent_{item.agent_name}")
         logging.info(reg_result)
         env_vars = {
-                "HOMESERVER": "https://matrix.pixx.co",
-                "USER_ID": reg_result['user_id'],
-                "PASSWORD": password,
-                "DEVICE_ID": reg_result['device_id'],
-                "SUPERAGENT_URL": "https://api.pixx.co",
-                "AGENT_ID": item.agent_id,
-                "API_KEY": item.api_key
+            "HOMESERVER": "https://matrix.pixx.co",
+            "USER_ID": reg_result['user_id'],
+            "PASSWORD": password,
+            "DEVICE_ID": reg_result['device_id'],
+            "SUPERAGENT_URL": "https://api.pixx.co",
+            "AGENT_ID": item.agent_id,
+            "API_KEY": item.api_key
         }
 
         deploy_bot = start_ecs_task(env_vars)
@@ -63,20 +64,21 @@ async def add_item(item: Item):
         await prisma.user.create({
             'username': "",
             'bot_username': reg_result['user_id'],
-            'password' : password,
+            'password': password,
             'api_key': item.api_key,
             'id': item.agent_id,
             'email_id': item.email_id,
             'name': item.agent_name,
             'desc': item.agent_desc,
             'profile_photo': item.profile if item.profile else "",
-            'access_token' : get_access_token(reg_result['user_id'],password),
-            'type' : "AGENT"
+            'access_token': get_access_token(reg_result['user_id'], password),
+            'type': "AGENT"
         })
-        return {"status" : "created","user_id": reg_result}
+        return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
-        return {"status" : f"error: {e}"}
+        return {"status": f"error: {e}"}
+
 
 @app.post("/add/workflows")
 async def add_item(item: WorkflowItem):
@@ -86,13 +88,13 @@ async def add_item(item: WorkflowItem):
             item.bot_username, password, item.bot_username, f"superagent_{item.agent_name}")
         logging.info(reg_result)
         env_vars = {
-                "HOMESERVER": "https://matrix.pixx.co",
-                "USER_ID": reg_result['user_id'],
-                "PASSWORD": password,
-                "DEVICE_ID": reg_result['device_id'],
-                "SUPERAGENT_URL": "https://api.pixx.co",
-                "WORKFLOW_ID": item.workflow_id,
-                "API_KEY": item.api_key
+            "HOMESERVER": "https://matrix.pixx.co",
+            "USER_ID": reg_result['user_id'],
+            "PASSWORD": password,
+            "DEVICE_ID": reg_result['device_id'],
+            "SUPERAGENT_URL": "https://api.pixx.co",
+            "WORKFLOW_ID": item.workflow_id,
+            "API_KEY": item.api_key
         }
 
         deploy_bot = start_ecs_task(env_vars)
@@ -100,20 +102,21 @@ async def add_item(item: WorkflowItem):
         await prisma.user.create({
             'username': "",
             'bot_username': reg_result['user_id'],
-            'password' : password,
+            'password': password,
             'api_key': item.api_key,
             'id': item.workflow_id,
             'email_id': item.email_id,
             'name': item.workflow_name,
             'desc': item.workflow_desc,
             'profile_photo': item.profile if item.profile else "",
-            'access_token' : get_access_token(reg_result['user_id'],password),
+            'access_token': get_access_token(reg_result['user_id'], password),
             'type': "WORKFLOW"
         })
-        return {"status" : "created","user_id": reg_result}
+        return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
-        return {"status" : f"error: {e}"}
+        return {"status": f"error: {e}"}
+
 
 @app.delete("/list/{username}/del")
 async def delete_item(item: Item, username: str = Path(..., title="The username", description="Username of the user")):
@@ -135,37 +138,48 @@ async def get_list(username: str = Path(..., title="The username", description="
         return items
     return []
 
+
 @app.get("/agents/{agent_id}")
 async def get_bot(agent_id):
     get_bot = await prisma.user.find_first(
-        where= {
-            "id" : agent_id
+        where={
+            "id": agent_id
         }
     )
     return get_bot
 
-@app.get('/list')
-async def bots_list(tag: str = None):
+
+@app.post("/bots/update")
+async def update_bot(item :AgentUpdate ,agent_id):
+    get_bot = await prisma.user.update(
+        where={
+            "id": agent_id
+        },
+        data= {
+            "desc" : item.description
+        }
+    )
+    return get_bot
+
+
+@app.get('/botlist')
+async def bots_list(tag: str = None) -> list[Bots]:
     if tag is None:
-        data = await prisma.bots.find_many(
-            include= {
-                'meta' : True,
-            }
-        )
+        data = await prisma.user.find_many()
     else:
-        data = await prisma.bots.find_first(
-            where = {
-                'meta': {
-                        'tags' : {
-                            'has_every' : [tag]
-                        }
+        data = await prisma.user.find_first(
+            where={
+                'tags': {
+                    'has_every': [tag]
                 }
-            },
-            include= {
-                'meta' : True
             }
         )
-    return [TAG_MAPPING ,data]
+    return data
+
+@app.post('/agent/duplicate')
+async def agent_duplicate(item: Agent):
+    return True
+
 
 @app.get('/get_list/enterprise')
 async def get_list():
@@ -183,11 +197,11 @@ async def get_list():
                             "description": "An enterprise finance bot for real-time financial analysis."
                         }
                     ],
-                    "popular_rooms" : [
+                    "popular_rooms": [
                         {
-                            "room_id" : "#trading:pixx.co",
-                            "room_name" : "Trading",
-                            "description" : "A room for aspiring traders."
+                            "room_id": "#trading:pixx.co",
+                            "room_name": "Trading",
+                            "description": "A room for aspiring traders."
                         }
                     ]
                 },
@@ -200,11 +214,11 @@ async def get_list():
                             "description": "Boost your team's productivity with task management and reminders."
                         }
                     ],
-                    "popular_rooms" : [
+                    "popular_rooms": [
                         {
-                            "room_id" : "#Pomodoro:pixx.co",
-                            "room_name" : "Pomodoro",
-                            "description" : "A room for Productivity enthusiasts."
+                            "room_id": "#Pomodoro:pixx.co",
+                            "room_name": "Pomodoro",
+                            "description": "A room for Productivity enthusiasts."
                         }
                     ]
                 }
@@ -233,11 +247,11 @@ async def get_list():
                             "description": "Challenge yourself with fun trivia questions and quizzes."
                         }
                     ],
-                    "popular_rooms" : [
+                    "popular_rooms": [
                         {
-                            "room_id" : "#Music:pixx.co",
-                            "room_name" : "Music",
-                            "description" : "A room for music lovers."
+                            "room_id": "#Music:pixx.co",
+                            "room_name": "Music",
+                            "description": "A room for music lovers."
                         }
                     ]
                 },
@@ -250,11 +264,11 @@ async def get_list():
                             "description": "Translate between languages with ease using this bot."
                         }
                     ],
-                    "popular_rooms" : [
+                    "popular_rooms": [
                         {
-                            "room_id" : "#Klingon:pixx.co",
-                            "room_name" : "Klingon",
-                            "description" : "Learn Klingon with AI bots."
+                            "room_id": "#Klingon:pixx.co",
+                            "room_name": "Klingon",
+                            "description": "Learn Klingon with AI bots."
                         }
                     ]
                 }
