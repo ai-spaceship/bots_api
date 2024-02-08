@@ -48,7 +48,8 @@ class Bots(BaseModel):
     desc: str
     name: str
     tags: list
-    agent_id: str
+    id: str
+    type: str
 
 class Agent(BaseModel):
     bot_username: str
