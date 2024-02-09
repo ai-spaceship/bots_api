@@ -52,8 +52,7 @@ class Bots(BaseModel):
     type: str
 
 class Agent(BaseModel):
-    bot_username: str
-    author: str
+    username: str
     agent_id: str
 
     

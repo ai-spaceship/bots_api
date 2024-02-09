@@ -74,7 +74,7 @@ async def add_item(item: Item):
             'access_token': get_access_token(reg_result['user_id'], password),
             'type': "AGENT",
             'publish': item.publish,
-            'tags' : item.tags.split(',')
+            'tags': item.tags.split(',')
         })
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
@@ -114,7 +114,7 @@ async def add_item(item: WorkflowItem):
             'access_token': get_access_token(reg_result['user_id'], password),
             'type': "WORKFLOW",
             'publish': item.publish,
-            'tags' : item.tags.split(',')
+            'tags': item.tags.split(',')
         })
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
@@ -154,13 +154,13 @@ async def get_bot(agent_id):
 
 
 @app.post("/bots/update")
-async def update_bot(item :AgentUpdate ,agent_id):
+async def update_bot(item: AgentUpdate, agent_id):
     get_bot = await prisma.user.update(
         where={
             "id": agent_id
         },
-        data= {
-            "desc" : item.description
+        data={
+            "desc": item.description
         }
     )
     return get_bot
@@ -180,12 +180,13 @@ async def bots_list(tag: str = None) -> list[Bots]:
         )
     return data
 
+
 @app.post('/agent/duplicate')
 async def agent_duplicate(item: Agent):
     return True
 
 
-@app.get('/get_list/enterprise')
+@app.get('/botlist/enterprise')
 async def get_list():
     return {
         "status": "success",
@@ -196,16 +197,24 @@ async def get_list():
                     "title": "Finance",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_finance:pixx.co",
-                            "bot_name": "FinanceBot",
-                            "description": "An enterprise finance bot for real-time financial analysis."
+                             "author": "@bot_finance:pixx.co",
+                             "bot_username": "@bot_finance:pixx.co",
+                             "desc": "An enterprise finance bot for real-time financial analysis.",
+                             "name": "FinanceBot",
+                             "tags": ["finance", "analysis", "real-time"],
+                             "id": "ed15f86a-50f4-4db2-a1f4-4e7b8d51b530",
+                             "type": "Finance"
                         }
                     ],
                     "popular_rooms": [
                         {
-                            "room_id": "#trading:pixx.co",
-                            "room_name": "Trading",
-                            "description": "A room for aspiring traders."
+                            "author": "@bot_finance:pixx.co",
+                            "room_id": "#Pomodoro:pixx.co",
+                            "desc": "An enterprise finance bot for real-time financial analysis.",
+                            "name": "FinanceBot",
+                            "tags": ["finance", "analysis", "real-time"],
+                            "id": "ed15f86a-50f4-4db2-a1f4-4e7b8d51b530",
+                            "type": "Finance"
                         }
                     ]
                 },
@@ -213,16 +222,24 @@ async def get_list():
                     "title": "Productivity",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_productivity:pixx.co",
-                            "bot_name": "ProductivityBot",
-                            "description": "Boost your team's productivity with task management and reminders."
+                             "author": "@bot_productivity:pixx.co",
+                             "bot_username": "@bot_productivity:pixx.co",
+                             "desc": "Boost your team's productivity with task management and reminders.",
+                             "name": "ProductivityBot",
+                             "tags": ["productivity", "task management", "reminders"],
+                             "id": "8eb6419b-7f6d-4c5e-884b-042f2b6cf460",
+                             "type": "Finance"
                         }
                     ],
                     "popular_rooms": [
                         {
+                            "author": "@bot_productivity:pixx.co",
                             "room_id": "#Pomodoro:pixx.co",
-                            "room_name": "Pomodoro",
-                            "description": "A room for Productivity enthusiasts."
+                            "desc": "Boost your team's productivity with task management and reminders.",
+                            "name": "ProductivityBot",
+                            "tags": ["productivity", "task management", "reminders"],
+                            "id": "8eb6419b-7f6d-4c5e-884b-042f2b6cf460",
+                            "type": "Finance"
                         }
                     ]
                 }
@@ -237,50 +254,66 @@ async def get_list():
     }
 
 
-@app.get('/get_list/community')
+@app.get('/botlist/community')
 async def get_list():
     return {
         "data": {
             "categories": [
                 {
-                    "title": "Entertainment",
+                    "title": "Health",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_entertainment:pixx.co",
-                            "bot_name": "TriviaBot",
-                            "description": "Challenge yourself with fun trivia questions and quizzes."
+                            "author": "@bot_health:pixx.co",
+                            "bot_username": "@bot_health:pixx.co",
+                            "desc": "Monitor your health metrics and provide personalized health tips.",
+                            "name": "HealthBot",
+                            "tags": ["health", "monitoring", "personalized tips"],
+                            "id": "614d743e-2f65-4c9b-910b-7d66a9f2049b",
+                            "type": "Health"
                         }
                     ],
                     "popular_rooms": [
                         {
-                            "room_id": "#Music:pixx.co",
-                            "room_name": "Music",
-                            "description": "A room for music lovers."
+                            "author": "@bot_health:pixx.co",
+                            "room_id": "#bot_health:pixx.co",
+                            "desc": "Monitor your health metrics and provide personalized health tips.",
+                            "name": "HealthBot",
+                            "tags": ["health", "monitoring", "personalized tips"],
+                            "id": "614d743e-2f65-4c9b-910b-7d66a9f2049b",
+                            "type": "Health"
                         }
                     ]
                 },
                 {
-                    "title": "Language",
+                    "title": "Business",
                     "popular_bots": [
                         {
-                            "bot_id": "@bot_language:pixx.co",
-                            "bot_name": "TranslatorBot",
-                            "description": "Translate between languages with ease using this bot."
+                            "author": "@bot_hr:pixx.co",
+                            "bot_username": "@bot_hr:pixx.co",
+                            "desc": "Streamline your HR processes with automated onboarding and employee management.",
+                            "name": "HRBot",
+                            "tags": ["HR", "onboarding", "employee management"],
+                            "id": "6a14b065-9a2e-4d2c-bacd-b1a2d382140c",
+                            "type": "Business"
                         }
                     ],
                     "popular_rooms": [
                         {
-                            "room_id": "#Klingon:pixx.co",
-                            "room_name": "Klingon",
-                            "description": "Learn Klingon with AI bots."
+                            "author": "@bot_hr:pixx.co",
+                            "bot_username": "#bot_hr:pixx.co",
+                            "desc": "Streamline your HR processes with automated onboarding and employee management.",
+                            "name": "HRBot",
+                            "tags": ["HR", "onboarding", "employee management"],
+                            "id": "6a14b065-9a2e-4d2c-bacd-b1a2d382140c",
+                            "type": "Business"
                         }
                     ]
                 }
                 # Add more community categories here...
             ],
             "category_keys": [
-                "Entertainment",
-                "Language"
+                "Health",
+                "Business"
                 # Add more community category keys here...
             ]
         }
