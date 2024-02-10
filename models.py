@@ -43,12 +43,12 @@ class AgentUpdate(BaseModel):
     avatar: Optional[str]
 
 class Bots(BaseModel):
-    author: str
+    id: str
+    username: str
     bot_username: str
     desc: str
     name: str
     tags: list
-    id: str
     type: str
 
 class Agent(BaseModel):
