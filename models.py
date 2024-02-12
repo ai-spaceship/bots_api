@@ -50,7 +50,7 @@ class Bots(BaseModel):
     name: str
     tags: list
     type: str
-    profile: str
+    profile_photo: str
 
 class Agent(BaseModel):
     username: str
