@@ -59,7 +59,7 @@ async def add_item(item: Item):
         }
         token = reg_result['access_token']
         if item.profile:
-            await set_profile(token, homeserver="https://matrix.pixx.co", user_id=reg_result['user_id'], profile_url=item.profile)
+            await set_profile(password, homeserver="https://matrix.pixx.co", user_id=reg_result['user_id'], profile_url=item.profile)
 
         deploy_bot = start_ecs_task(env_vars)
         logging.info(deploy_bot)
@@ -167,7 +167,7 @@ async def update_bot(item: AgentUpdate, agent_id):
         }
     )
     if item.avatar:
-            await set_profile(get_bot.access_token, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, profile_url=item.avatar)
+            await set_profile(get_bot.password, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, profile_url=item.avatar)
 
     return get_bot
 

@@ -60,11 +60,12 @@ def get_access_token(username,password):
     if response.status_code == 200:
         return response.json()['access_token']
     
-async def set_profile(access_token, homeserver, user_id, profile_url):
+async def set_profile(password, homeserver, user_id, profile_url):
     client = AsyncClient(homeserver, user_id)
-    await client.login(token=access_token)
+    await client.login(password)
     data = requests.get(profile_url)
     upload_img = BytesIO(data.content)
     profile_mxc = await client.upload(upload_img, content_type=data.headers['Content-Type'])
-    response = await client.set_avatar(profile_mxc)
+    response = await client.set_avatar(profile_mxc[0].content_uri)
+    await client.close()
     return response
