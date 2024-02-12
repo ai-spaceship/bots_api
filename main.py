@@ -162,7 +162,8 @@ async def update_bot(item: AgentUpdate, agent_id):
             "id": agent_id
         },
         data={
-            "desc": item.description
+            "desc": item.description,
+            "profile_photo": item.avatar
         }
     )
     if item.avatar:
