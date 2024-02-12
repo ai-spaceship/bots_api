@@ -1,6 +1,8 @@
+from io import BytesIO
 import requests
 import random
 import os
+from nio import AsyncClient
 
 MATRIX_API_URL = "https://matrix.pixx.co"
 
@@ -57,3 +59,12 @@ def get_access_token(username,password):
     response = requests.post(url, json=body)
     if response.status_code == 200:
         return response.json()['access_token']
+    
+async def set_profile(access_token, homeserver, user_id, profile_url):
+    client = AsyncClient(homeserver, user_id)
+    await client.login(token=access_token)
+    data = requests.get(profile_url)
+    upload_img = BytesIO(data.content)
+    profile_mxc = await client.upload(upload_img, content_type=data.headers['Content-Type'])
+    response = await client.set_avatar(profile_mxc)
+    return response

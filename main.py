@@ -5,10 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 from prisma import Prisma
-from config import TAG_MAPPING
 
 from utils.deployBot import start_ecs_task
-from utils.createBot import get_access_token, get_email_from_username, register_bot, generatePassword
+from utils.matrixApi import get_access_token, get_email_from_username, register_bot, generatePassword, set_profile
 from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
 
 app = FastAPI()
@@ -58,6 +57,9 @@ async def add_item(item: Item):
             "AGENT_ID": item.agent_id,
             "API_KEY": item.api_key
         }
+        token = reg_result['access_token']
+        if item.profile:
+            await set_profile(token, homeserver="https://matrix.pixx.co", user_id=reg_result['user_id'], profile_url=item.profile)
 
         deploy_bot = start_ecs_task(env_vars)
         logging.info(deploy_bot)
@@ -71,7 +73,7 @@ async def add_item(item: Item):
             'name': item.agent_name,
             'desc': item.agent_desc,
             'profile_photo': item.profile if item.profile else "",
-            'access_token': get_access_token(reg_result['user_id'], password),
+            'access_token': token,
             'type': "AGENT",
             'publish': item.publish,
             'tags': item.tags.split(',')
@@ -163,6 +165,9 @@ async def update_bot(item: AgentUpdate, agent_id):
             "desc": item.description
         }
     )
+    if item.avatar:
+            await set_profile(get_bot.access_token, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, profile_url=item.avatar)
+
     return get_bot
 
 

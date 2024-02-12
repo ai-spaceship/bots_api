@@ -9,7 +9,7 @@ COPY ./requirements.txt /code/requirements.txt
 
 #
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir  requests matrix-nio[e2e] boto3 fastapi gunicorn uvicorn prisma
+RUN pip install --no-cache-dir  requests matrix-nio boto3 fastapi gunicorn uvicorn prisma
 
 # 
 COPY . /code
