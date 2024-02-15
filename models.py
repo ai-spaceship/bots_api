@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel
 
 class Item(BaseModel):
@@ -41,6 +41,8 @@ class AgentUpdate(BaseModel):
     llmModel: Optional[str]
     description: Optional[str]
     avatar: Optional[str]
+    type: Optional[str]
+    metadata: Optional[Dict[str, Any]]
 
 class Bots(BaseModel):
     id: str
