@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
 
 from utils.deployBot import start_ecs_task
-from utils.matrixApi import get_access_token, get_email_from_username, register_bot, generatePassword, set_profile
+from utils.matrixApi import get_access_token, get_email_from_username, register_bot, generatePassword, register_user, set_profile
 from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
 
 app = FastAPI()
@@ -88,8 +88,8 @@ async def add_item(item: Item):
 async def add_item(item: WorkflowItem):
     password = generatePassword(10)
     try:
-        reg_result = register_bot(
-            item.bot_username, password, item.bot_username, f"superagent_{item.agent_name}")
+        reg_result = register_user(
+            item.bot_username, password, f"superagent_{item.agent_name}")
         logging.info(reg_result)
         env_vars = {
             "HOMESERVER": "https://matrix.pixx.co",
