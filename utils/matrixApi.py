@@ -32,7 +32,6 @@ def register_bot(username, password, display_name, device_id):
     }
     url = f"{MATRIX_API_URL}/_matrix/client/v3/register"
     response = requests.post(url, json=body)
-    print(response.json())
     if (response.status_code == 200):
         return response.json()
     else:
@@ -86,10 +85,8 @@ def get_email_from_username(username):
     headers = {"Authorization": f"Bearer {auth_token}"}
     req = requests.get(
         f'{MATRIX_API_URL}/_synapse/admin/v2/users/{username}', headers=headers)
-    print(req.status_code)
     if req.status_code == 200:
         data = req.json()
-        print(data)
         if data["threepids"] is not []:
             return data["threepids"][0]["address"]
     return None

@@ -35,7 +35,6 @@ def update_agent_bots(region_name, cluster):
                 }],
             },
         )
-        print(1)
 
 if __name__ == "__main__":
     update_agent_bots('us-east-1', 'devCluster')

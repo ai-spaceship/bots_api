@@ -49,7 +49,6 @@ async def add_item(item: Item):
     try:
         reg_result = register_user(
             item.bot_username, password, item.agent_name)
-        print(reg_result)
         logging.info(reg_result)
         env_vars = {
             "HOMESERVER": "https://matrix.pixx.co",
@@ -164,11 +163,7 @@ async def update_bot(item: AgentUpdate, agent_id):
         where={
             "id": agent_id
         },
-        data={
-            "desc": item.description,
-            "profile_photo": item.avatar,
-            "name" : item.name
-        }
+        data=item.dict(exclude_none=True)
     )
     if item.avatar:
             await set_profile(get_bot.password, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, profile_url=item.avatar)
