@@ -41,9 +41,9 @@ def register_bot(username, password, display_name, device_id):
 
 
 def generate_mac(nonce, user, password, admin=False, user_type=None):
-
+    shared_secret = bytes(SHARED_SECRET, "utf-8")
     mac = hmac.new(
-      key=SHARED_SECRET,
+      key=shared_secret,
       digestmod=hashlib.sha1,
     )
 
@@ -63,8 +63,8 @@ def generate_mac(nonce, user, password, admin=False, user_type=None):
 def register_user(username, password, display_name, device_id=None):
     auth_token = os.environ["AUTH_TOKEN"]
     headers = {"Authorization": f"Bearer {auth_token}"}
-    nonce = requests.get(f'{MATRIX_API_URL}/_synapse/admin/v1/register')
-    gen_hmac = generate_mac(nonce, username, password)
+    nonce = requests.get(f'{MATRIX_API_URL}/_synapse/admin/v1/register', headers=headers)
+    gen_hmac = generate_mac(nonce.json()["nonce"], username, password)
     body = {
         "nonce": nonce.json()["nonce"],
         "username": username,
@@ -73,7 +73,7 @@ def register_user(username, password, display_name, device_id=None):
         "admin": False,
         "mac": gen_hmac
     }
-    req = requests.get(
+    req = requests.post(
         f'{MATRIX_API_URL}/_synapse/admin/v1/register', headers=headers, json=body)
     if (req.status_code == 200):
         return req.json()
@@ -119,3 +119,10 @@ async def set_profile(password, homeserver, user_id, profile_url):
     response = await client.set_avatar(profile_mxc[0].content_uri)
     await client.close()
     return response
+
+async def set_display_name(password, homeserver, user_id, name):
+    client = AsyncClient(homeserver, user_id)
+    await client.login(password)
+    await client.set_displayname(name)
+    await client.close()
+    return True

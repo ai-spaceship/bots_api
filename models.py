@@ -52,7 +52,7 @@ class Bots(BaseModel):
     name: str
     tags: list
     type: str
-    profile_photo: str
+    profile_photo: Optional[str]
 
 class Agent(BaseModel):
     username: str

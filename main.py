@@ -2,12 +2,14 @@ import logging
 
 from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
+#from dotenv import load_dotenv
 
+#load_dotenv()
 
 from prisma import Prisma
 
 from utils.deployBot import start_ecs_task
-from utils.matrixApi import get_access_token, get_email_from_username, register_bot, generatePassword, register_user, set_profile
+from utils.matrixApi import get_access_token, get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
 
 app = FastAPI()
@@ -45,8 +47,9 @@ async def shutdown():
 async def add_item(item: Item):
     password = generatePassword(10)
     try:
-        reg_result = register_bot(
-            item.bot_username, password, item.bot_username, f"superagent_{item.agent_name}")
+        reg_result = register_user(
+            item.bot_username, password, item.agent_name)
+        print(reg_result)
         logging.info(reg_result)
         env_vars = {
             "HOMESERVER": "https://matrix.pixx.co",
@@ -89,7 +92,7 @@ async def add_item(item: WorkflowItem):
     password = generatePassword(10)
     try:
         reg_result = register_user(
-            item.bot_username, password, f"superagent_{item.agent_name}")
+            item.bot_username, password, item.agent_name)
         logging.info(reg_result)
         env_vars = {
             "HOMESERVER": "https://matrix.pixx.co",
@@ -163,12 +166,14 @@ async def update_bot(item: AgentUpdate, agent_id):
         },
         data={
             "desc": item.description,
-            "profile_photo": item.avatar
+            "profile_photo": item.avatar,
+            "name" : item.name
         }
     )
     if item.avatar:
             await set_profile(get_bot.password, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, profile_url=item.avatar)
-
+    if item.name:
+        await set_display_name(get_bot.password, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, name=item.name)
     return get_bot
 
 
