@@ -1,16 +1,20 @@
 import logging
+import os
 
 from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
-#from dotenv import load_dotenv
-
-#load_dotenv()
-
 from prisma import Prisma
 
 from utils.deployBot import start_ecs_task
 from utils.matrixApi import get_access_token, get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
+
+#from dotenv import load_dotenv
+#load_dotenv()
+
+#Global Variables
+MATRIX_API_URL = os.environ["MATRIX_URL"]
+SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 
 app = FastAPI()
 prisma = Prisma()
@@ -51,17 +55,17 @@ async def add_item(item: Item):
             item.bot_username, password, item.agent_name)
         logging.info(reg_result)
         env_vars = {
-            "HOMESERVER": "https://matrix.pixx.co",
+            "HOMESERVER": MATRIX_API_URL,
             "USER_ID": reg_result['user_id'],
             "PASSWORD": password,
             "DEVICE_ID": reg_result['device_id'],
-            "SUPERAGENT_URL": "https://api.pixx.co",
+            "SUPERAGENT_URL": SUPERAGENT_API_URL,
             "AGENT_ID": item.agent_id,
             "API_KEY": item.api_key
         }
         token = reg_result['access_token']
         if item.profile:
-            await set_profile(password, homeserver="https://matrix.pixx.co", user_id=reg_result['user_id'], profile_url=item.profile)
+            await set_profile(password, homeserver=MATRIX_API_URL, user_id=reg_result['user_id'], profile_url=item.profile)
 
         deploy_bot = start_ecs_task(env_vars)
         logging.info(deploy_bot)
@@ -94,11 +98,11 @@ async def add_item(item: WorkflowItem):
             item.bot_username, password, item.agent_name)
         logging.info(reg_result)
         env_vars = {
-            "HOMESERVER": "https://matrix.pixx.co",
+            "HOMESERVER": MATRIX_API_URL,
             "USER_ID": reg_result['user_id'],
             "PASSWORD": password,
             "DEVICE_ID": reg_result['device_id'],
-            "SUPERAGENT_URL": "https://api.pixx.co",
+            "SUPERAGENT_URL": SUPERAGENT_API_URL,
             "WORKFLOW_ID": item.workflow_id,
             "API_KEY": item.api_key
         }
@@ -159,16 +163,17 @@ async def get_bot(agent_id):
 
 @app.post("/bots/update")
 async def update_bot(item: AgentUpdate, agent_id):
+    if item.avatar:
+            get_mxc = await set_profile(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, profile_url=item.avatar)
+            item.avatar_mxc = get_mxc
+    if item.name:
+        await set_display_name(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, name=item.name)
     get_bot = await prisma.user.update(
         where={
             "id": agent_id
         },
         data=item.dict(exclude_none=True)
     )
-    if item.avatar:
-            await set_profile(get_bot.password, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, profile_url=item.avatar)
-    if item.name:
-        await set_display_name(get_bot.password, homeserver="https://matrix.pixx.co", user_id=get_bot.bot_username, name=item.name)
     return get_bot
 
 
@@ -191,136 +196,3 @@ async def bots_list(tag: str = None) -> list[Bots]:
 async def agent_duplicate(item: Agent):
     return True
 
-
-@app.get('/botlist/enterprise')
-async def get_list():
-    return {
-        "status": "success",
-        "message": "List of bots by enterprise categories",
-        "data": {
-            "categories": [
-                {
-                    "title": "Finance",
-                    "popular_bots": [
-                        {
-                             "author": "@bot_finance:pixx.co",
-                             "bot_username": "@bot_finance:pixx.co",
-                             "desc": "An enterprise finance bot for real-time financial analysis.",
-                             "name": "FinanceBot",
-                             "tags": ["finance", "analysis", "real-time"],
-                             "id": "ed15f86a-50f4-4db2-a1f4-4e7b8d51b530",
-                             "type": "Finance"
-                        }
-                    ],
-                    "popular_rooms": [
-                        {
-                            "author": "@bot_finance:pixx.co",
-                            "room_id": "#Pomodoro:pixx.co",
-                            "desc": "An enterprise finance bot for real-time financial analysis.",
-                            "name": "FinanceBot",
-                            "tags": ["finance", "analysis", "real-time"],
-                            "id": "ed15f86a-50f4-4db2-a1f4-4e7b8d51b530",
-                            "type": "Finance"
-                        }
-                    ]
-                },
-                {
-                    "title": "Productivity",
-                    "popular_bots": [
-                        {
-                             "author": "@bot_productivity:pixx.co",
-                             "bot_username": "@bot_productivity:pixx.co",
-                             "desc": "Boost your team's productivity with task management and reminders.",
-                             "name": "ProductivityBot",
-                             "tags": ["productivity", "task management", "reminders"],
-                             "id": "8eb6419b-7f6d-4c5e-884b-042f2b6cf460",
-                             "type": "Finance"
-                        }
-                    ],
-                    "popular_rooms": [
-                        {
-                            "author": "@bot_productivity:pixx.co",
-                            "room_id": "#Pomodoro:pixx.co",
-                            "desc": "Boost your team's productivity with task management and reminders.",
-                            "name": "ProductivityBot",
-                            "tags": ["productivity", "task management", "reminders"],
-                            "id": "8eb6419b-7f6d-4c5e-884b-042f2b6cf460",
-                            "type": "Finance"
-                        }
-                    ]
-                }
-                # Add more enterprise categories here...
-            ],
-            "category_keys": [
-                "Finance",
-                "Productivity"
-                # Add more enterprise category keys here...
-            ]
-        }
-    }
-
-
-@app.get('/botlist/community')
-async def get_list():
-    return {
-        "data": {
-            "categories": [
-                {
-                    "title": "Health",
-                    "popular_bots": [
-                        {
-                            "author": "@bot_health:pixx.co",
-                            "bot_username": "@bot_health:pixx.co",
-                            "desc": "Monitor your health metrics and provide personalized health tips.",
-                            "name": "HealthBot",
-                            "tags": ["health", "monitoring", "personalized tips"],
-                            "id": "614d743e-2f65-4c9b-910b-7d66a9f2049b",
-                            "type": "Health"
-                        }
-                    ],
-                    "popular_rooms": [
-                        {
-                            "author": "@bot_health:pixx.co",
-                            "room_id": "#bot_health:pixx.co",
-                            "desc": "Monitor your health metrics and provide personalized health tips.",
-                            "name": "HealthBot",
-                            "tags": ["health", "monitoring", "personalized tips"],
-                            "id": "614d743e-2f65-4c9b-910b-7d66a9f2049b",
-                            "type": "Health"
-                        }
-                    ]
-                },
-                {
-                    "title": "Business",
-                    "popular_bots": [
-                        {
-                            "author": "@bot_hr:pixx.co",
-                            "bot_username": "@bot_hr:pixx.co",
-                            "desc": "Streamline your HR processes with automated onboarding and employee management.",
-                            "name": "HRBot",
-                            "tags": ["HR", "onboarding", "employee management"],
-                            "id": "6a14b065-9a2e-4d2c-bacd-b1a2d382140c",
-                            "type": "Business"
-                        }
-                    ],
-                    "popular_rooms": [
-                        {
-                            "author": "@bot_hr:pixx.co",
-                            "bot_username": "#bot_hr:pixx.co",
-                            "desc": "Streamline your HR processes with automated onboarding and employee management.",
-                            "name": "HRBot",
-                            "tags": ["HR", "onboarding", "employee management"],
-                            "id": "6a14b065-9a2e-4d2c-bacd-b1a2d382140c",
-                            "type": "Business"
-                        }
-                    ]
-                }
-                # Add more community categories here...
-            ],
-            "category_keys": [
-                "Health",
-                "Business"
-                # Add more community category keys here...
-            ]
-        }
-    }

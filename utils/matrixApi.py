@@ -1,11 +1,15 @@
-from io import BytesIO
-import requests
+import logging
 import random
 import os
-from nio import AsyncClient
 import hmac, hashlib
+from io import BytesIO
 
-MATRIX_API_URL = "https://matrix.pixx.co"
+import requests
+from nio import AsyncClient
+from nio.responses import ProfileSetAvatarError
+
+
+MATRIX_API_URL = os.environ["MATRIX_URL"]
 SHARED_SECRET = os.environ["SHARED_SECRET"]
 
 
@@ -114,8 +118,11 @@ async def set_profile(password, homeserver, user_id, profile_url):
     upload_img = BytesIO(data.content)
     profile_mxc = await client.upload(upload_img, content_type=data.headers['Content-Type'])
     response = await client.set_avatar(profile_mxc[0].content_uri)
+    if type(response) == ProfileSetAvatarError:
+        logging.error(response)
+        return None
     await client.close()
-    return response
+    return profile_mxc[0].content_uri
 
 async def set_display_name(password, homeserver, user_id, name):
     client = AsyncClient(homeserver, user_id)

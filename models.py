@@ -43,6 +43,7 @@ class AgentUpdate(BaseModel):
     avatar: Optional[str]
     type: Optional[str]
     metadata: Optional[Dict[str, Any]]
+    avatar_mxc: Optional[str]
 
 class Bots(BaseModel):
     id: str
@@ -52,7 +53,7 @@ class Bots(BaseModel):
     name: str
     tags: list
     type: str
-    profile_photo: Optional[str]
+    avatar_mxc: Optional[str]
 
 class Agent(BaseModel):
     username: str

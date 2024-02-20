@@ -26,5 +26,6 @@ model User {
   access_token  String
   publish       Boolean
   tags          String[]
+  avatar_mxc    String?
 }
 
