@@ -4,10 +4,12 @@ import os
 from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
+from httpx import AsyncClient
 
 from utils.deployBot import start_ecs_task
 from utils.matrixApi import get_access_token, get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
+from utils.superagent import handleWorkflowBots
 
 #from dotenv import load_dotenv
 #load_dotenv()
@@ -18,6 +20,7 @@ SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 
 app = FastAPI()
 prisma = Prisma()
+session = AsyncClient(follow_redirects=True)
 
 origins = ["*"]
 
@@ -95,7 +98,7 @@ async def add_item(item: WorkflowItem):
     password = generatePassword(10)
     try:
         reg_result = register_user(
-            item.bot_username, password, item.agent_name)
+            item.bot_username, password, item.workflow_name)
         logging.info(reg_result)
         env_vars = {
             "HOMESERVER": MATRIX_API_URL,
@@ -119,11 +122,12 @@ async def add_item(item: WorkflowItem):
             'name': item.workflow_name,
             'desc': item.workflow_desc,
             'profile_photo': item.profile if item.profile else "",
-            'access_token': get_access_token(reg_result['user_id'], password),
+            'access_token': reg_result['access_token'],
             'type': "WORKFLOW",
             'publish': item.publish,
             'tags': item.tags.split(',')
         })
+        await handleWorkflowBots(SUPERAGENT_API_URL, item.workflow_id, item.api_key, session, item.email_id)
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
