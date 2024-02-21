@@ -127,7 +127,7 @@ async def add_item(item: WorkflowItem):
             'publish': item.publish,
             'tags': item.tags.split(',')
         })
-        await handleWorkflowBots(SUPERAGENT_API_URL, item.workflow_id, item.api_key, session, item.email_id)
+        await handleWorkflowBots(SUPERAGENT_API_URL, item.workflow_id, item.api_key, session, prisma, item.email_id)
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
