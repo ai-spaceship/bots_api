@@ -2,7 +2,7 @@ import logging
 import httpx
 from prisma import Prisma
 from prisma.models import User
-from utils import genUsername
+from utils.genUsername import check_username_availability
 import os
 from utils.deployBot import start_ecs_task
 
@@ -28,22 +28,22 @@ async def workflow_steps(superagent_url: str, workflow_id: str, api_key: str, se
 
 
 async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session, prisma: Prisma, email_id):
-    workflow_data = workflow_steps(
+    workflow_data = await workflow_steps(
         superagent_url, workflow_id, api_key, session)
     for agents in workflow_data:
         agent_id = agents["agentId"]
-        get_bot: User = await prisma.user.find_first(
+        get_bot: User = await prisma.user.find_unique(
             where={
                 "id": agent_id
             }
         )
-
         if not get_bot:
             password = generatePassword(12)
             try:
                 agent_data = agents["agent"]
-                reg_result = register_user(genUsername(
+                reg_result = register_user(check_username_availability(
                     agent_data["name"]), password, agent_data["name"])
+                logging.info(reg_result)
                 env_vars = {
                     "HOMESERVER": MATRIX_API_URL,
                     "USER_ID": reg_result['user_id'],
