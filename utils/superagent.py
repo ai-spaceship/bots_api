@@ -68,7 +68,7 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     'access_token': reg_result['access_token'],
                     'type': "AGENT",
                     'publish': False,
-                    'tags': "Workflow"
+                    'tags': [agent_data["name"]]
                 })
             except Exception as e:
                 logging.error(e)
