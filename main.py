@@ -7,8 +7,8 @@ from prisma import Prisma
 from httpx import AsyncClient
 
 from utils.deployBot import start_ecs_task
-from utils.matrixApi import get_access_token, get_email_from_username, generatePassword, register_user, set_display_name, set_profile
-from models import Agent, AgentUpdate, Bot, Bots, Item, Users, WorkflowItem
+from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
+from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
 from utils.superagent import handleWorkflowBots
 
 #Global Variables
@@ -162,7 +162,7 @@ async def get_bot(agent_id):
     return get_bot
 
 @app.get("/bot/{username}")
-async def bot_info(username) -> Bot:
+async def bot_info(username) -> Bots:
     info = await prisma.user.find_first(
         where={
             "bot_username" : username
