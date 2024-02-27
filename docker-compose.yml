@@ -12,7 +12,7 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self' *.pixx.co"
+      - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Content-Security-Policy=frame-ancestors 'self' pixx.co *.pixx.co"
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Permission-Policy=interest-cohort=()"
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.Strict-Transport-Security=max-age=31536000; includeSubDomains"
       - "traefik.http.middlewares.japi-add-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
