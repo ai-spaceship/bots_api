@@ -8,11 +8,8 @@ from httpx import AsyncClient
 
 from utils.deployBot import start_ecs_task
 from utils.matrixApi import get_access_token, get_email_from_username, generatePassword, register_user, set_display_name, set_profile
-from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
+from models import Agent, AgentUpdate, Bot, Bots, Item, Users, WorkflowItem
 from utils.superagent import handleWorkflowBots
-
-#from dotenv import load_dotenv
-#load_dotenv()
 
 #Global Variables
 MATRIX_API_URL = os.environ["MATRIX_URL"]
@@ -164,6 +161,16 @@ async def get_bot(agent_id):
     )
     return get_bot
 
+@app.get("/bot/{username}")
+async def bot_info(username) -> Bot:
+    info = await prisma.user.find_first(
+        where={
+            "bot_username" : username
+        }
+        
+    )
+    return info
+
 
 @app.post("/bots/update")
 async def update_bot(item: AgentUpdate, agent_id):
@@ -198,5 +205,11 @@ async def bots_list(tag: str = None) -> list[Bots]:
 
 @app.post('/agent/duplicate')
 async def agent_duplicate(item: Agent):
+    email_id = get_email_from_username(item.username)
+    get_agent = await prisma.user.find_first(
+        where={
+            "id" : item.agent_id
+        }
+    )
     return True
 

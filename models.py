@@ -57,7 +57,15 @@ class Bots(BaseModel):
 
 class Agent(BaseModel):
     username: str
+    email_id: Optional[str]
     agent_id: str
+
+class Bot(BaseModel):
+    id: str
+    name: str
+    type: str
+
+
 
     
 
