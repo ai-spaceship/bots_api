@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import FastAPI, HTTPException, Path, Request
+from fastapi import FastAPI, HTTPException, Path, Request, BackgroundTasks, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from prisma import Prisma
 from httpx import AsyncClient
@@ -10,6 +10,7 @@ from utils.deployBot import start_ecs_task
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
 from utils.superagent import handleWorkflowBots
+from connections import ConnectionManager
 
 #Global Variables
 MATRIX_API_URL = os.environ["MATRIX_URL"]
@@ -18,6 +19,7 @@ SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 app = FastAPI()
 prisma = Prisma()
 session = AsyncClient(follow_redirects=True)
+manager = ConnectionManager()
 
 origins = ["*"]
 
@@ -45,6 +47,20 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await prisma.disconnect()
+
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    data = await prisma.user.find_first()
+    try:
+        while True:
+            #data = await websocket.receive_text()
+            await manager.send_personal_message(data)
+            #await manager.broadcast(data)
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client #{client_id} left the chat")
 
 
 @app.post("/add")
