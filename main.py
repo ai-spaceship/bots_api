@@ -7,7 +7,7 @@ from httpx import AsyncClient
 
 from utils.deployBot import start_ecs_task
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
-from models import Agent, AgentUpdate, Bots, Item, Users, WorkflowItem
+from models import Agent, AgentUpdate, Bots, Item, MergedList, Users, WorkflowItem
 from utils.superagent import handleWorkflowBots
 from utils.prisma import prisma
 from node.sock import sio_app, sio
@@ -142,14 +142,20 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 
 @app.get("/list/{username}")
-async def get_list(username: str = Path(..., title="The username", description="Username of the user")) -> list[Users]:
+async def get_list(username: str = Path(..., title="The username", description="Username of the user")) :
     get_email = get_email_from_username(username)
+    public  = await prisma.user.find_many(
+        where={
+            "publish": True
+        }
+    )
+    print(get_email)
     if get_email is not None:
         items = await prisma.user.find_many(where={
             'email_id': get_email
         })
-        return items
-    return []
+        return {"personal": items , "public": public}
+    return {"personal" : [] , "public": public}
 
 
 @app.get("/agents/{agent_id}")
@@ -191,7 +197,11 @@ async def update_bot(item: AgentUpdate, agent_id):
 @app.get('/botlist')
 async def bots_list(tag: str = None) -> list[Bots]:
     if tag is None:
-        data = await prisma.user.find_many()
+        data = await prisma.user.find_many(
+            where={
+                "publish": True
+            }
+        )
     else:
         data = await prisma.user.find_first(
             where={
@@ -200,7 +210,6 @@ async def bots_list(tag: str = None) -> list[Bots]:
                 }
             }
         )
-    await sio.emit(data)
     return data
 
 

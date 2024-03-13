@@ -29,7 +29,6 @@ class Users(BaseModel):
     bot_username: str
     name: str
 
-
 class UserCreate(BaseModel):
     username: str
 
@@ -60,6 +59,10 @@ class Agent(BaseModel):
     username: str
     email_id: Optional[str]
     agent_id: str
+
+class MergedList(BaseModel):
+    personal: list[Bots]
+    public: list[Bots]
 
 
 
