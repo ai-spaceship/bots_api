@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import FastAPI, HTTPException, Path, Request, BackgroundTasks, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 
@@ -10,7 +10,6 @@ from utils.matrixApi import get_email_from_username, generatePassword, register_
 from models import Agent, AgentUpdate, Bots, Item, MergedList, Users, WorkflowItem
 from utils.superagent import handleWorkflowBots
 from utils.prisma import prisma
-from node.sock import sio_app, sio
 
 #Global Variables
 MATRIX_API_URL = os.environ["MATRIX_URL"]
@@ -18,7 +17,6 @@ SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 
 app = FastAPI()
 session = AsyncClient(follow_redirects=True)
-app.mount("/ws", app=sio_app)
 
 origins = ["*"]
 

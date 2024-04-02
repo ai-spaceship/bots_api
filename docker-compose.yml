@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  my_pony_client_container:
+  bots_api_container:
     image: agifm/bots_api
     container_name: japi
     env_file:
