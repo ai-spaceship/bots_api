@@ -165,7 +165,7 @@ async def get_bot(agent_id):
     return get_bot
 
 @app.get("/bot/{username}")
-async def bot_info(username) -> Bots:
+async def bot_info(username) -> Bots | None:
     info = await prisma.user.find_first(
         where={
             "bot_username" : username
