@@ -34,8 +34,8 @@ class UserCreate(BaseModel):
 
 class AgentUpdate(BaseModel):
     name: Optional[str]
-    description: Optional[str] = Field(alias="desc")
-    avatar: Optional[str] = Field("avatar_mxc")
+    desc: Optional[str] = Field(alias="description")
+    avatar_mxc: Optional[str] = Field("avatar")
 
 class Bots(BaseModel):
     id: str
