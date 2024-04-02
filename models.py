@@ -49,6 +49,8 @@ class Bots(BaseModel):
     type: str
     avatar_mxc: Optional[str]
     profile_photo: Optional[str]
+    prompt: Optional[str]
+    llmModel: Optional[str]
 
 class User(BaseModel):
     id: str
