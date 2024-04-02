@@ -145,14 +145,14 @@ async def get_list(username: str = Path(..., title="The username", description="
     public  = await prisma.user.find_many(
         where={
             "publish": True
-        }
+        }  
     )
     if get_email is not None:
         items = await prisma.user.find_many(where={
             'email_id': get_email
         })
-    result = MergedList(personal=items, public=public)
-    return result
+        return {"personal" : items, "public" : public}
+    return {"personal": [], "public" : public}
 
 
 @app.get("/agents/{agent_id}")

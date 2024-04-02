@@ -35,7 +35,9 @@ class UserCreate(BaseModel):
 class AgentUpdate(BaseModel):
     name: Optional[str]
     desc: Optional[str] = Field(alias="description")
-    avatar_mxc: Optional[str] = Field("avatar")
+    avatar_mxc: Optional[str] = Field(alias="avatar")
+    prompt: Optional[str]
+    llmModel: Optional[str]
 
 class Bots(BaseModel):
     id: str
@@ -48,14 +50,25 @@ class Bots(BaseModel):
     avatar_mxc: Optional[str]
     profile_photo: Optional[str]
 
+class User(BaseModel):
+    id: str
+    bot_username: str
+    desc: str
+    name: str
+    tags: list
+    type: str
+    avatar_mxc : Optional[str]
+    prompt: Optional[str]
+    llmModel: Optional[str]
+
 class Agent(BaseModel):
     username: str
     email_id: Optional[str]
     agent_id: str
 
 class MergedList(BaseModel):
-    personal: list[Bots]
-    public: list[Bots]
+    personal: list[Optional[User]]
+    public: list[Optional[User]]
 
 
 
