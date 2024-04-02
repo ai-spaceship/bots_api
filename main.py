@@ -177,17 +177,18 @@ async def bot_info(username) -> Bots:
 
 @app.post("/bots/update")
 async def update_bot(item: AgentUpdate, agent_id):
-    if item.avatar_mxc:
-            get_mxc = await set_profile(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, profile_url=item.avatar_mxc)
-            item.avatar_mxc = get_mxc
-    if item.name:
-        await set_display_name(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, name=item.name)
     get_bot = await prisma.user.update(
         where={
             "id": agent_id
         },
         data=item.dict(exclude_none=True)
     )
+    if get_bot:
+        if item.avatar_mxc:
+                get_mxc = await set_profile(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, profile_url=item.avatar_mxc)
+                item.avatar_mxc = get_mxc
+        if item.name:
+            await set_display_name(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, name=item.name)
     return get_bot
 
 
