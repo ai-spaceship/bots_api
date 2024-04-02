@@ -16,7 +16,8 @@ def check_username_availability(username):
     response = requests.get(api_url)
     data = response.json()
     if data.get('available'):
-        return username
+        print(data)
+        return format_username
     else:
         # Username is not available, append a random number and try again
         new_username = username + '_' + str(random.randint(1, 1000))

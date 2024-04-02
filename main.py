@@ -142,20 +142,19 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 
 @app.get("/list/{username}")
-async def get_list(username: str = Path(..., title="The username", description="Username of the user")) :
+async def get_list(username: str = Path(..., title="The username", description="Username of the user")) -> MergedList:
     get_email = get_email_from_username(username)
     public  = await prisma.user.find_many(
         where={
             "publish": True
         }
     )
-    print(get_email)
     if get_email is not None:
         items = await prisma.user.find_many(where={
             'email_id': get_email
         })
-        return {"personal": items , "public": public}
-    return {"personal" : [] , "public": public}
+    result = MergedList(personal=items, public=public)
+    return result
 
 
 @app.get("/agents/{agent_id}")
@@ -182,14 +181,14 @@ async def bot_info(username) -> Bots:
 async def update_bot(item: AgentUpdate, agent_id):
     if item.avatar:
             get_mxc = await set_profile(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, profile_url=item.avatar)
-            item.avatar_mxc = get_mxc
+            item.avatar = get_mxc
     if item.name:
         await set_display_name(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, name=item.name)
     get_bot = await prisma.user.update(
         where={
             "id": agent_id
         },
-        data=item.dict(exclude_none=True)
+        data=item.dict(exclude_none=True, by_alias=True)
     )
     return get_bot
 

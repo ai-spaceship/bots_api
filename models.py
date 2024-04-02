@@ -1,5 +1,5 @@
 from typing import Any, Dict, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 class Item(BaseModel):
     email_id: Optional[str]
@@ -33,16 +33,9 @@ class UserCreate(BaseModel):
     username: str
 
 class AgentUpdate(BaseModel):
-    isActive: Optional[bool]
     name: Optional[str]
-    initialMessage: Optional[str]
-    prompt: Optional[str]
-    llmModel: Optional[str]
-    description: Optional[str]
-    avatar: Optional[str]
-    type: Optional[str]
-    metadata: Optional[Dict[str, Any]]
-    avatar_mxc: Optional[str]
+    description: Optional[str] = Field(alias="desc")
+    avatar: Optional[str] = Field("avatar_mxc")
 
 class Bots(BaseModel):
     id: str
