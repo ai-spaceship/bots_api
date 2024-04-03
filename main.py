@@ -7,7 +7,7 @@ from httpx import AsyncClient
 
 from utils.deployBot import start_ecs_task
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
-from models import Agent, AgentUpdate, Bots, Item, MergedList, Users, WorkflowItem
+from models import Agent, AgentUpdate, Bots, Item
 from utils.superagent import handleWorkflowBots
 from utils.prisma import prisma
 
@@ -50,7 +50,7 @@ async def add_item(item: Item):
     password = generatePassword(10)
     try:
         reg_result = register_user(
-            item.bot_username, password, item.agent_name)
+            item.bot_username, password, item.name)
         logging.info(reg_result)
         env_vars = {
             "HOMESERVER": MATRIX_API_URL,
@@ -58,13 +58,13 @@ async def add_item(item: Item):
             "PASSWORD": password,
             "DEVICE_ID": reg_result['device_id'],
             "SUPERAGENT_URL": SUPERAGENT_API_URL,
-            "AGENT_ID": item.agent_id,
-            "API_KEY": item.api_key
+            "ID": item.id,
+            "API_KEY": item.api_key,
+            "TYPE" : item.type
         }
         token = reg_result['access_token']
         if item.profile:
             await set_profile(password, homeserver=MATRIX_API_URL, user_id=reg_result['user_id'], profile_url=item.profile)
-
         deploy_bot = start_ecs_task(env_vars)
         logging.info(deploy_bot)
         await prisma.user.create({
@@ -72,62 +72,22 @@ async def add_item(item: Item):
             'bot_username': reg_result['user_id'],
             'password': password,
             'api_key': item.api_key,
-            'id': item.agent_id,
+            'id': item.id,
             'email_id': item.email_id,
-            'name': item.agent_name,
-            'desc': item.agent_desc,
+            'name': item.name,
+            'desc': item.description,
             'profile_photo': item.profile if item.profile else "",
             'access_token': token,
-            'type': "AGENT",
+            'type': item.type,
             'publish': item.publish,
             'tags': item.tags.split(',')
         })
+        if item.type == "WORKFLOW":
+            await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id)
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
         return {"status": f"error: {e}"}
-
-
-@app.post("/add/workflows")
-async def add_item(item: WorkflowItem):
-    password = generatePassword(10)
-    try:
-        reg_result = register_user(
-            item.bot_username, password, item.workflow_name)
-        logging.info(reg_result)
-        env_vars = {
-            "HOMESERVER": MATRIX_API_URL,
-            "USER_ID": reg_result['user_id'],
-            "PASSWORD": password,
-            "DEVICE_ID": reg_result['device_id'],
-            "SUPERAGENT_URL": SUPERAGENT_API_URL,
-            "WORKFLOW_ID": item.workflow_id,
-            "API_KEY": item.api_key
-        }
-
-        deploy_bot = start_ecs_task(env_vars)
-        logging.info(deploy_bot)
-        await prisma.user.create({
-            'username': "",
-            'bot_username': reg_result['user_id'],
-            'password': password,
-            'api_key': item.api_key,
-            'id': item.workflow_id,
-            'email_id': item.email_id,
-            'name': item.workflow_name,
-            'desc': item.workflow_desc,
-            'profile_photo': item.profile if item.profile else "",
-            'access_token': reg_result['access_token'],
-            'type': "WORKFLOW",
-            'publish': item.publish,
-            'tags': item.tags.split(',')
-        })
-        await handleWorkflowBots(SUPERAGENT_API_URL, item.workflow_id, item.api_key, session, prisma, item.email_id)
-        return {"status": "created", "user_id": reg_result}
-    except Exception as e:
-        logging.error(e)
-        return {"status": f"error: {e}"}
-
 
 @app.delete("/list/{username}/del")
 async def delete_item(item: Item, username: str = Path(..., title="The username", description="Username of the user")):
@@ -140,7 +100,7 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 
 @app.get("/list/{username}")
-async def get_list(username: str = Path(..., title="The username", description="Username of the user")) -> MergedList:
+async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
     get_email = get_email_from_username(username)
     public  = await prisma.user.find_many(
         where={

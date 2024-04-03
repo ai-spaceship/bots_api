@@ -5,24 +5,13 @@ class Item(BaseModel):
     email_id: Optional[str]
     bot_username: str
     api_key: str
-    agent_name: str
-    agent_desc: str
-    agent_id: str
-    profile: str
-    tags: str
-    publish: bool
-
-class WorkflowItem(BaseModel):
-    email_id: Optional[str]
-    bot_username: str
-    api_key: str
-    workflow_name: str
-    workflow_desc: str
-    workflow_id: str
+    name: str
+    description: str
+    id: str
     profile: Optional[str]
     tags: str
     publish: bool
-
+    type: str
 
 class Users(BaseModel):
     email_id: str
@@ -67,11 +56,6 @@ class Agent(BaseModel):
     username: str
     email_id: Optional[str]
     agent_id: str
-
-class MergedList(BaseModel):
-    personal: list[Optional[User]]
-    public: list[Optional[User]]
-
 
 
 
