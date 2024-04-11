@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 
-from utils.deployBot import start_ecs_task
+from utils.deployDocker import deploy
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item
 from utils.superagent import handleWorkflowBots
@@ -65,7 +65,7 @@ async def add_item(item: Item):
         token = reg_result['access_token']
         if item.profile:
             await set_profile(password, homeserver=MATRIX_API_URL, user_id=reg_result['user_id'], profile_url=item.profile)
-        deploy_bot = start_ecs_task(env_vars)
+        deploy_bot = deploy(username=item.bot_username, env=env_vars)
         logging.info(deploy_bot)
         await prisma.user.create({
             'username': "",

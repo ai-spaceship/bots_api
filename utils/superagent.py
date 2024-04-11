@@ -2,9 +2,9 @@ import logging
 import httpx
 from prisma import Prisma
 from prisma.models import User
+from utils.deployDocker import deploy
 from utils.genUsername import check_username_availability
 import os
-from utils.deployBot import start_ecs_task
 
 from utils.matrixApi import generatePassword, register_user
 
@@ -41,8 +41,9 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
             password = generatePassword(12)
             try:
                 agent_data = agents["agent"]
-                reg_result = register_user(check_username_availability(
-                    agent_data["name"]), password, agent_data["name"])
+                username = check_username_availability(
+                    agent_data["name"])
+                reg_result = register_user(username, password, agent_data["name"])
                 logging.info(reg_result)
                 env_vars = {
                     "HOMESERVER": MATRIX_API_URL,
@@ -53,7 +54,7 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     "AGENT_ID": agent_id,
                     "API_KEY": api_key
                 }
-                deploy_bot = start_ecs_task(env_vars)
+                deploy_bot = deploy(username, env_vars)
                 logging.info(deploy_bot)
                 await prisma.user.create({
                     'username': "",

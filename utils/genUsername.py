@@ -5,26 +5,31 @@ import os
 
 MATRIX_API_URL = os.environ["MATRIX_URL"]
 
-def check_username_availability(username):
+def check_username_availability(username, formatted=False):
     # Replace special characters with _
-    format_username = re.sub(r'[^\w]', '_', username).lower()
+    if not formatted:
+        username = re.sub(r'[^\w]', '_', username).lower()
 
+    generate_username = username + str(random.randint(1, 10000))
     # API endpoint
-    api_url = f"{MATRIX_API_URL}/_matrix/client/v3/register/available?username={format_username}"
+    api_url = f"{MATRIX_API_URL}/_matrix/client/v3/register/available?username={generate_username}"
     
     # Check if the username is available
     response = requests.get(api_url)
-    data = response.json()
-    if data.get('available'):
-        print(data)
-        return format_username
+    if response.status_code == 200:
+        return generate_username
     else:
         # Username is not available, append a random number and try again
-        new_username = username + '_' + str(random.randint(1, 1000))
-        return check_username_availability(new_username)
+        return check_username_availability(username, True)
 
 # Example usage
 if __name__ == "__main__":
     input_username = input("Enter preferred username: ")
+    import time
+
+    start = time.time()
     available_username = check_username_availability(input_username)
     print("Available username:", available_username)
+
+    end = time.time()
+    print(end - start)
