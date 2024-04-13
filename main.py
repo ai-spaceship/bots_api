@@ -9,13 +9,14 @@ from utils.deployDocker import deploy
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item
 from utils.superagent import handleWorkflowBots
-from utils.prisma import prisma
+from prisma import Prisma
 
 #Global Variables
 MATRIX_API_URL = os.environ["MATRIX_URL"]
 SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 
 app = FastAPI()
+prisma = Prisma()
 session = AsyncClient(follow_redirects=True)
 
 origins = ["*"]
