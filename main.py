@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 
-from utils import getUsername
+from utils.getUsername import get_username
 from utils.deployDocker import deploy
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item
@@ -54,7 +54,7 @@ async def add_item(item: Item):
         reg_result = register_user(
             item.bot_username, password, item.name)
         logging.info(reg_result)
-        owner_id = await getUsername(item.email_id)
+        owner_id = await get_username(item.email_id)
         env_vars = {
             "HOMESERVER": MATRIX_API_URL,
             "USER_ID": reg_result['user_id'],
@@ -87,7 +87,7 @@ async def add_item(item: Item):
             'tags': item.tags.split(',')
         })
         if item.type == "WORKFLOW":
-            await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id)
+            await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id, owner_id)
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
