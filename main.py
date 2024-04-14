@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 
+from utils import getUsername
 from utils.deployDocker import deploy
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
 from models import Agent, AgentUpdate, Bots, Item
@@ -53,6 +54,7 @@ async def add_item(item: Item):
         reg_result = register_user(
             item.bot_username, password, item.name)
         logging.info(reg_result)
+        owner_id = getUsername(item.email_id)
         env_vars = {
             "HOMESERVER": MATRIX_API_URL,
             "USER_ID": reg_result['user_id'],
@@ -61,7 +63,8 @@ async def add_item(item: Item):
             "SUPERAGENT_URL": SUPERAGENT_API_URL,
             "ID": item.id,
             "API_KEY": item.api_key,
-            "TYPE" : item.type
+            "TYPE" : item.type,
+            "OWNER_ID" : owner_id
         }
         token = reg_result['access_token']
         if item.profile:
@@ -69,7 +72,7 @@ async def add_item(item: Item):
         deploy_bot = deploy(username=item.bot_username, env=env_vars)
         logging.info(deploy_bot)
         await prisma.user.create({
-            'username': "",
+            'username': owner_id,
             'bot_username': reg_result['user_id'],
             'password': password,
             'api_key': item.api_key,
@@ -102,16 +105,15 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 @app.get("/list/{username}")
 async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
-    get_email = get_email_from_username(username)
     public  = await prisma.user.find_many(
         where={
             "publish": True
         }  
     )
-    if get_email is not None:
-        items = await prisma.user.find_many(where={
-            'email_id': get_email
-        })
+    items = await prisma.user.find_many(where={
+            'username' : username
+    })
+    if items:
         return {"personal" : items, "public" : public}
     return {"personal": [], "public" : public}
 
