@@ -27,7 +27,7 @@ async def workflow_steps(superagent_url: str, workflow_id: str, api_key: str, se
     return response.json()
 
 
-async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session, prisma: Prisma, email_id):
+async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session, prisma: Prisma, email_id, owner_id):
     workflow_data = await workflow_steps(
         superagent_url, workflow_id, api_key, session)
     for agents in workflow_data:
@@ -52,12 +52,13 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     "DEVICE_ID": reg_result['device_id'],
                     "SUPERAGENT_URL": SUPERAGENT_API_URL,
                     "AGENT_ID": agent_id,
-                    "API_KEY": api_key
+                    "API_KEY": api_key,
+                    "OWNER_ID" : owner_id
                 }
                 deploy_bot = await deploy(username, env_vars)
                 logging.info(deploy_bot)
                 await prisma.user.create({
-                    'username': "",
+                    'username': owner_id,
                     'bot_username': reg_result['user_id'],
                     'password': password,
                     'api_key': api_key,

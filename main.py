@@ -54,7 +54,7 @@ async def add_item(item: Item):
         reg_result = register_user(
             item.bot_username, password, item.name)
         logging.info(reg_result)
-        owner_id = getUsername(item.email_id)
+        owner_id = await getUsername(item.email_id)
         env_vars = {
             "HOMESERVER": MATRIX_API_URL,
             "USER_ID": reg_result['user_id'],
