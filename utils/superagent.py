@@ -54,7 +54,7 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     "AGENT_ID": agent_id,
                     "API_KEY": api_key
                 }
-                deploy_bot = deploy(username, env_vars)
+                deploy_bot = await deploy(username, env_vars)
                 logging.info(deploy_bot)
                 await prisma.user.create({
                     'username': "",

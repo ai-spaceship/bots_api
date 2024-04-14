@@ -69,7 +69,7 @@ async def add_item(item: Item):
         token = reg_result['access_token']
         if item.profile:
             await set_profile(password, homeserver=MATRIX_API_URL, user_id=reg_result['user_id'], profile_url=item.profile)
-        deploy_bot = deploy(username=item.bot_username, env=env_vars)
+        deploy_bot = await deploy(username=item.bot_username, env=env_vars)
         logging.info(deploy_bot)
         await prisma.user.create({
             'username': owner_id,
