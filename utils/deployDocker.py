@@ -1,5 +1,7 @@
 import aiohttp
-from config import docker_ip
+import os
+
+docker_ip = os.environ["DOCKER_IP"]
 
 async def deploy(username, env):
     data = {
