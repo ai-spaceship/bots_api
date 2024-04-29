@@ -51,7 +51,8 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     "PASSWORD": password,
                     "DEVICE_ID": reg_result['device_id'],
                     "SUPERAGENT_URL": SUPERAGENT_API_URL,
-                    "AGENT_ID": agent_id,
+                    "ID": agent_id,
+                    "TYPE" : "AGENT",
                     "API_KEY": api_key,
                     "OWNER_ID" : owner_id
                 }
