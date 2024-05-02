@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Path, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import AsyncClient
 
+from utils.genUsername import check_username_availability
 from utils.getUsername import get_username
 from utils.deployDocker import deploy
 from utils.matrixApi import get_email_from_username, generatePassword, register_user, set_display_name, set_profile
@@ -51,8 +52,12 @@ async def shutdown():
 async def add_item(item: Item):
     password = generatePassword(10)
     try:
+        if bot_username != "" :
+            bot_username = item.bot_username
+        else:
+            bot_username = check_username_availability("testworkflow")
         reg_result = register_user(
-            item.bot_username, password, item.name)
+            bot_username, password, item.name)
         logging.info(reg_result)
         owner_id = await get_username(item.email_id)
         env_vars = {
@@ -69,7 +74,7 @@ async def add_item(item: Item):
         token = reg_result['access_token']
         if item.profile:
             await set_profile(password, homeserver=MATRIX_API_URL, user_id=reg_result['user_id'], profile_url=item.profile)
-        deploy_bot = await deploy(username=item.bot_username, env=env_vars)
+        deploy_bot = await deploy(username=bot_username, env=env_vars)
         logging.info(deploy_bot)
         await prisma.user.create({
             'username': owner_id,
@@ -136,6 +141,17 @@ async def bot_info(username) -> Bots | None:
         
     )
     return info
+
+@app.get("/user/{username}")
+async def get_api(username):
+    data = await prisma.user.find_first(
+        where={
+            "username" : username
+        }
+    )
+    if data:
+        return data.api_key
+    return ""
 
 
 @app.post("/bots/update")
