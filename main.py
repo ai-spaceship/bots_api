@@ -150,7 +150,7 @@ async def get_api(username):
         }
     )
     if data:
-        return data.api_key
+        return data.api_key, data.email_id
     return ""
 
 
