@@ -195,7 +195,7 @@ async def bots_list(tag: str = None) -> list[Bots]:
             }
         )
     else:
-        data = await prisma.user.find_first(
+        data = await prisma.user.find_many(
             where={
                 'tags': {
                     'has_every': [tag]
