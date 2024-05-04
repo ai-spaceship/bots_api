@@ -9,10 +9,17 @@ async def deploy(username, env):
         'env_vars' : env
     }
     async with aiohttp.ClientSession() as session:
-        async with session.post(f'http://{docker_ip}:8080/deploy', json=data) as response:
+        async with session.post(f'{docker_ip}/deploy', json=data) as response:
             if response.status == 200:
                 data = await response.json()
             else:
                 return None
     
     return data["container_id"]
+
+async def restart(username):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"{docker_ip}/restart/{username}") as response:
+            if response.status == 200:
+                return True
+    return False
