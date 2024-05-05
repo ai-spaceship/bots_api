@@ -76,7 +76,7 @@ async def add_item(item: Item):
             await set_profile(password, homeserver=MATRIX_API_URL, user_id=reg_result['user_id'], profile_url=item.profile)
         deploy_bot = await deploy(username=bot_username, env=env_vars)
         logging.info(deploy_bot)
-        await prisma.user.create({
+        await prisma.bot.create({
             'username': owner_id,
             'bot_username': reg_result['user_id'],
             'password': password,
@@ -100,7 +100,7 @@ async def add_item(item: Item):
 
 @app.delete("/list/{username}/del")
 async def delete_item(item: Item, username: str = Path(..., title="The username", description="Username of the user")):
-    items = await prisma.user.delete(where={
+    items = await prisma.bot.delete(where={
         'id': username
     })
     if item:
@@ -110,12 +110,12 @@ async def delete_item(item: Item, username: str = Path(..., title="The username"
 
 @app.get("/list/{username}")
 async def get_list(username: str = Path(..., title="The username", description="Username of the user")):
-    public  = await prisma.user.find_many(
+    public  = await prisma.bot.find_many(
         where={
             "publish": True
         }  
     )
-    items = await prisma.user.find_many(where={
+    items = await prisma.bot.find_many(where={
             'username' : username
     })
     if items:
@@ -125,7 +125,7 @@ async def get_list(username: str = Path(..., title="The username", description="
 
 @app.get("/agents/{agent_id}")
 async def get_bot(agent_id):
-    get_bot = await prisma.user.find_first(
+    get_bot = await prisma.bot.find_first(
         where={
             "id": agent_id
         }
@@ -134,7 +134,7 @@ async def get_bot(agent_id):
 
 @app.get("/bot/{username}")
 async def bot_info(username) -> Bots | None:
-    info = await prisma.user.find_first(
+    info = await prisma.bot.find_first(
         where={
             "bot_username" : username
         }
@@ -144,7 +144,7 @@ async def bot_info(username) -> Bots | None:
 
 @app.get("/user/{username}")
 async def get_api(username):
-    data = await prisma.user.find_first(
+    data = await prisma.bot.find_first(
         where={
             "username" : username
         }
@@ -155,7 +155,7 @@ async def get_api(username):
 
 @app.post("/bots/restart/{username}")
 async def restart_bot(username):
-    bot_data = await prisma.user.find_first(
+    bot_data = await prisma.bot.find_first(
         where={
             "bot_username": username
         }
@@ -166,7 +166,7 @@ async def restart_bot(username):
 
 @app.post("/bots/update")
 async def update_bot(item: AgentUpdate, agent_id):
-    get_bot = await prisma.user.find_first(
+    get_bot = await prisma.bot.find_first(
         where={
             "id": agent_id
         }
@@ -177,7 +177,7 @@ async def update_bot(item: AgentUpdate, agent_id):
                 item.avatar_mxc = get_mxc
         if item.name:
             await set_display_name(get_bot.password, homeserver=MATRIX_API_URL, user_id=get_bot.bot_username, name=item.name)
-    get_bot = await prisma.user.update(
+    get_bot = await prisma.bot.update(
         where={
             "id": agent_id
         },
@@ -189,13 +189,13 @@ async def update_bot(item: AgentUpdate, agent_id):
 @app.get('/botlist')
 async def bots_list(tag: str = None) -> list[Bots]:
     if tag is None:
-        data = await prisma.user.find_many(
+        data = await prisma.bot.find_many(
             where={
                 "publish": True
             }
         )
     else:
-        data = await prisma.user.find_many(
+        data = await prisma.bot.find_many(
             where={
                 'tags': {
                     'has_every': [tag]
@@ -204,14 +204,33 @@ async def bots_list(tag: str = None) -> list[Bots]:
         )
     return data
 
+@app.post("/workflows/{workflowId}/config")
+async def save_yaml(workflow_id, item: str):
+    await prisma.workflow.upsert(
+        where={
+            "id" : workflow_id
+        },
+        data={
+            "create": {
+                
+            }
+        }
+    )
+
 
 @app.post('/agent/duplicate')
 async def agent_duplicate(item: Agent):
-    email_id = get_email_from_username(item.username)
-    get_agent = await prisma.user.find_first(
+    api_key = await prisma.bot.find_first(
+        where={
+            "username" : item.username
+        }
+    )
+    get_agent = await prisma.bot.find_first(
         where={
             "id" : item.agent_id
         }
     )
+    if get_agent.type == "WORKFLOW":
+        pass
     return True
 

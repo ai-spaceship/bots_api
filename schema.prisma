@@ -10,7 +10,7 @@ generator db {
   recursive_type_depth = 5
 }
 
-model User {
+model Bot {
   id            String   @id
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
@@ -29,4 +29,17 @@ model User {
   avatar_mxc    String?
   prompt        String?
   llmModel      String?
+}
+
+model Workflow {
+  id            String  @id
+  username      String
+  yaml          String
+  count         Int
+}
+
+model User {
+  id            String  @id
+  api_key       String 
+  email_id      String
 }
