@@ -33,10 +33,12 @@ class Bots(BaseModel):
     prompt: Optional[str]
     llmModel: Optional[str]
 
-class Agent(BaseModel):
+class Duplicate(BaseModel):
     username: str
     agent_id: str
     owner_id: Optional[str]
+    name:     str
+    description:  str
 
 
 

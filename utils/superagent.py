@@ -32,7 +32,7 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
         superagent_url, workflow_id, api_key, session)
     for agents in workflow_data:
         agent_id = agents["agentId"]
-        get_bot: User = await prisma.user.find_unique(
+        get_bot: User = await prisma.bot.find_unique(
             where={
                 "id": agent_id
             }
@@ -58,7 +58,7 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                 }
                 deploy_bot = await deploy(username, env_vars)
                 logging.info(deploy_bot)
-                await prisma.user.create({
+                await prisma.bot.create({
                     'username': owner_id,
                     'bot_username': reg_result['user_id'],
                     'password': password,
@@ -77,3 +77,39 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                 logging.error(e)
                 return False
     return True
+
+
+async def create_workflow(superagent_url: str, name: str, description: str, api_key: str, session: httpx.AsyncClient):
+    headers = {
+        'Authorization': f'Bearer {api_key}',
+    }
+    api_url = f"{superagent_url}/api/v1/workflows"
+    data = {
+        "name" : name,
+        "description":  description
+    }
+    response = await session.post(
+        api_url,
+        headers=headers,
+        timeout=30,
+        json=data
+    )
+    if response.status_code == 200:
+        return response.json()["data"]
+    return response.json()
+
+async def update_yaml(superagent_url: str, workflow_id: str, api_key: str, yaml : str ,session: httpx.AsyncClient):
+    headers = {
+        'Authorization' : f'Bearer {api_key}',
+        'Content-Type'  : 'application/x-yaml'
+    }
+    api_url = f"{superagent_url}/api/v1/workflows/{workflow_id}/config"
+    response = await session.post(
+        api_url,
+        headers=headers,
+        timeout=30,
+        data=yaml
+    )
+    if response.status_code == 200:
+        return response.json()["data"]
+    return response.json()
