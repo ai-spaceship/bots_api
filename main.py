@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 
@@ -20,6 +21,8 @@ SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 app = FastAPI()
 prisma = Prisma()
 session = AsyncClient(follow_redirects=True)
+f = open('data.json')
+data = json.load(f)
 
 origins = ["*"]
 
@@ -192,8 +195,8 @@ async def update_bot(item: AgentUpdate, agent_id):
     return get_bot
 
 
-@app.get('/botlist')
-async def bots_list(tag: str = None) -> list[Bots]:
+@app.get('/botlist', response_model=list[Bots])
+async def bots_list(tag: str = None):
     if tag is None:
         data = await prisma.bot.find_many(
             where={
@@ -206,8 +209,14 @@ async def bots_list(tag: str = None) -> list[Bots]:
                 'tags': {
                     'has_every': [tag]
                 }
-            }
+            },
+
         )
+    return data
+
+
+@app.get("/public")
+async def public_list():
     return data
 
 
@@ -239,5 +248,6 @@ async def agent_duplicate(item: Duplicate):
             }
         )
         workflow = await create_workflow(SUPERAGENT_API_URL, item.name, item.description, get_agent.api_key, session)
-        update_yaml(SUPERAGENT_API_URL, workflow["id"], get_agent.api_key, workflow_data.yaml, session)
+        update_yaml(SUPERAGENT_API_URL,
+                    workflow["id"], get_agent.api_key, workflow_data.yaml, session)
     return True

@@ -1,0 +1,14 @@
+[
+    {
+        "name" : "Music",
+        "description" : "SOngs list",
+        "room_id" : "#music:pixx.co",
+        "category" : "fun"
+    },
+    {
+        "name" : "Groq",
+        "description" : "groq",
+        "space_id" : "#groq:pixx.co",
+        "category" : "agi"
+    }
+]
