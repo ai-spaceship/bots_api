@@ -10,5 +10,28 @@
         "description" : "groq",
         "space_id" : "#groq:pixx.co",
         "category" : "agi"
+    },
+    {
+        "name" : "Replicate",
+        "description" : "replicate ",
+        "room_id" : "#replicate:pixx.co",
+        "category" : "work"
+    },
+    {
+        "name" : "Stable Diffusion",
+        "description" : "SD XL",
+        "room_id" : "#sdxl:pixx.co",
+        "category" : "agi"
+    },    {
+        "name" : "Llama",
+        "description" : "meta's Llama 3",
+        "room_id" : "#Llama_3:pixx.co",
+        "category" : "agi"
+    },
+    {
+        "name" : "Claude 3",
+        "description" : "Google's Claude 3",
+        "room_id" : "#claude3:pixx.co",
+        "category" : "agi"
     }
 ]
