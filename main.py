@@ -234,8 +234,8 @@ async def save_yaml(workflow_id, item: str):
     )
 
 
-@app.post('/agent/duplicate')
-async def agent_duplicate(item: Duplicate):
+@app.post('/agent/duplicate/{username}')
+async def agent_duplicate(item: Bots):
     get_agent = await prisma.bot.find_first(
         where={
             "id": item.agent_id
