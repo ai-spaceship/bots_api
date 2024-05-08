@@ -56,7 +56,7 @@ async def shutdown():
 async def add_item(item: Item):
     password = generatePassword(10)
     try:
-        if bot_username != "":
+        if item.bot_username != "":
             bot_username = item.bot_username
         else:
             bot_username = check_username_availability("testworkflow")
