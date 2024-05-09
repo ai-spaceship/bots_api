@@ -14,6 +14,9 @@ class Item(BaseModel):
     publish: bool
     type: str
 
+class BotList(BaseModel):
+    bots : list
+
 
 class AgentUpdate(BaseModel):
     name: Optional[str]

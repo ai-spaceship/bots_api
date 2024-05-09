@@ -10,7 +10,7 @@ from utils.genUsername import check_username_availability
 from utils.getUsername import get_username
 from utils.deployDocker import deploy, restart
 from utils.matrixApi import generatePassword, register_user, set_display_name, set_profile
-from models import AgentUpdate, Bots, Duplicate, Item
+from models import AgentUpdate, BotList, Bots, Duplicate, Item
 from utils.superagent import create_workflow, handleWorkflowBots, update_yaml
 from prisma import Prisma
 
@@ -171,6 +171,20 @@ async def restart_bot(username):
     if bot_data:
         res = restart(username)
     return res
+
+@app.post("/bots/{room_id}/check")
+async def bots_check(botlist: BotList):
+    bots_data = await prisma.bot.find_many(
+        where={
+            "bot_username" : {
+                "in" : botlist.bots
+            }
+        }
+    )
+    result = { k:False for k in botlist.bots}
+    for i in bots_data:
+        result[i.bot_username] = True
+    return result
 
 
 @app.post("/bots/update")
