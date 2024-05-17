@@ -93,7 +93,8 @@ async def add_item(item: Item):
             'access_token': token,
             'type': item.type,
             'publish': item.publish,
-            'tags': item.tags.split(',')
+            'tags': item.tags.split(','),
+            'category' : item.category if item.category else "fun"
         })
         if item.type == "WORKFLOW":
             await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id, owner_id)

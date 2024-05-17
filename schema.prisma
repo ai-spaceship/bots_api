@@ -29,6 +29,7 @@ model Bot {
   avatar_mxc    String?
   prompt        String?
   llmModel      String?
+  category      String?  @default("fun")
 }
 
 model Workflow {

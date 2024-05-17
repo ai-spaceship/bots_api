@@ -13,6 +13,7 @@ class Item(BaseModel):
     tags: str
     publish: bool
     type: str
+    category: Optional[str]
 
 class BotList(BaseModel):
     bots : list
