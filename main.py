@@ -73,7 +73,8 @@ async def add_item(item: Item):
             "ID": item.id,
             "API_KEY": item.api_key,
             "TYPE": item.type,
-            "OWNER_ID": owner_id
+            "OWNER_ID": owner_id,
+            "STREAMING" : item.streaming
         }
         token = reg_result['access_token']
         if item.profile:
@@ -96,7 +97,7 @@ async def add_item(item: Item):
             'tags': item.tags.split(','),
             'category' : item.category if item.category else "fun"
         })
-        if item.type == "WORKFLOW":
+        if item.type == "WORKFLOW" and item.streaming == False:
             await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id, owner_id)
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
