@@ -13,7 +13,7 @@ class Item(BaseModel):
     tags: str
     publish: bool
     type: str
-    streaming: bool
+    streaming: Optional[bool] = Field(default=False)
     category: Optional[str]
 
 class BotList(BaseModel):
