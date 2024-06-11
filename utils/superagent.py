@@ -27,7 +27,7 @@ async def workflow_steps(superagent_url: str, workflow_id: str, api_key: str, se
     return response.json()
 
 
-async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session, prisma: Prisma, email_id, owner_id):
+async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session, prisma: Prisma, email_id, owner_id, publish):
     workflow_data = await workflow_steps(
         superagent_url, workflow_id, api_key, session)
     for agents in workflow_data:
@@ -70,7 +70,7 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     'profile_photo':agent_data["avatar"] if agent_data["avatar"] else "",
                     'access_token': reg_result['access_token'],
                     'type': "AGENT",
-                    'publish': False,
+                    'publish': True if publish else False,
                     'tags': [agent_data["name"]]
                 })
             except Exception as e:

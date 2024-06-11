@@ -14,6 +14,7 @@ class Item(BaseModel):
     publish: bool
     type: str
     streaming: Optional[bool] = Field(default=False)
+    publish_all : bool
     category: Optional[str]
 
 class BotList(BaseModel):

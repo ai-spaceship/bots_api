@@ -98,7 +98,7 @@ async def add_item(item: Item):
             'category' : item.category if item.category else "fun"
         })
         if item.type == "WORKFLOW" and item.streaming == False:
-            await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id, owner_id)
+            await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id, owner_id, item.publish_all)
         return {"status": "created", "user_id": reg_result}
     except Exception as e:
         logging.error(e)
