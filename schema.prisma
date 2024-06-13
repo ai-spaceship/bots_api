@@ -30,6 +30,7 @@ model Bot {
   prompt        String?
   llmModel      String?
   category      String  @default("fun")
+  streaming     Boolean
 }
 
 model Workflow {

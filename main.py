@@ -95,7 +95,8 @@ async def add_item(item: Item):
             'type': item.type,
             'publish': item.publish,
             'tags': item.tags.split(','),
-            'category' : item.category if item.category else "fun"
+            'category' : item.category if item.category else "fun",
+            'streaming': item.streaming
         })
         if item.type == "WORKFLOW" and item.streaming == False:
             await handleWorkflowBots(SUPERAGENT_API_URL, item.id, item.api_key, session, prisma, item.email_id, owner_id, item.publish_all)
@@ -171,8 +172,9 @@ async def restart_bot(username):
         }
     )
     if bot_data:
-        res = restart(username)
-    return res
+        res = await restart(username)
+        return res
+    raise HTTPException(detail="Username not found",status_code=401)
 
 @app.post("/bots/{room_id}/check")
 async def bots_check(botlist: BotList):
