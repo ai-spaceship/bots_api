@@ -9,7 +9,7 @@ from httpx import AsyncClient
 from utils.genUsername import check_username_availability
 from utils.getUsername import get_username
 from utils.deployDocker import deploy, restart
-from utils.matrixApi import generatePassword, register_user, set_display_name, set_profile
+from utils.matrixApi import generatePassword, get_email_from_username, register_user, set_display_name, set_profile
 from models import AgentUpdate, BotList, Bots, Duplicate, Item
 from utils.superagent import create_workflow, handleWorkflowBots, update_yaml
 from prisma import Prisma
@@ -160,8 +160,9 @@ async def get_api(username):
         }
     )
     if data:
-        return data.api_key, data.email_id
-    return ""
+        return data.email_id
+    data = await get_email_from_username(username)
+    return data
 
 
 @app.post("/bots/restart/{username}")

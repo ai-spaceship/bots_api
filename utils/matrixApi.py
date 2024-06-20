@@ -89,11 +89,12 @@ def get_email_from_username(username):
     headers = {"Authorization": f"Bearer {auth_token}"}
     req = requests.get(
         f'{MATRIX_API_URL}/_synapse/admin/v2/users/{username}', headers=headers)
+    print(req.json())
     if req.status_code == 200:
         data = req.json()
         if data["threepids"] is not []:
             return data["threepids"][0]["address"]
-    return None
+    return False
 
 
 def get_access_token(username, password):
