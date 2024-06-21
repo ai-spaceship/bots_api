@@ -161,7 +161,7 @@ async def get_api(username):
     )
     if data:
         return data.email_id
-    data = await get_email_from_username(username)
+    data = get_email_from_username(username)
     return data
 
 

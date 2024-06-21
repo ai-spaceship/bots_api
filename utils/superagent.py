@@ -54,7 +54,8 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     "ID": agent_id,
                     "TYPE" : "AGENT",
                     "API_KEY": api_key,
-                    "OWNER_ID" : owner_id
+                    "OWNER_ID" : owner_id,
+                    "STREAMING" : False
                 }
                 deploy_bot = await deploy(username, env_vars)
                 logging.info(deploy_bot)
@@ -71,7 +72,8 @@ async def handleWorkflowBots(superagent_url, workflow_id: str, api_key, session,
                     'access_token': reg_result['access_token'],
                     'type': "AGENT",
                     'publish': True if publish else False,
-                    'tags': [agent_data["name"]]
+                    'tags': [agent_data["name"]],
+                    "streaming" : False
                 })
             except Exception as e:
                 logging.error(e)
