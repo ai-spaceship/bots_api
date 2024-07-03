@@ -162,7 +162,7 @@ async def get_api(username):
     if data:
         return data.email_id
     data = get_email_from_username(username)
-    return data
+    return {"email" : data}
 
 
 @app.post("/bots/restart/{username}")
