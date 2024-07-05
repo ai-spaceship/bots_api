@@ -7,7 +7,7 @@ async def get_username(email):
     headers = {'Authorization': f"Bearer {admin_token}"}
     async with httpx.AsyncClient(headers=headers) as client:
         request = await client.get(
-            f"https://matrix.pixx.co/_synapse/admin/v1/threepid/email/users/{email}"
+            f"https://matrix.spaceship.im/_synapse/admin/v1/threepid/email/users/{email}"
         )
     if request.status_code == 200:
         username = request.json()
@@ -16,5 +16,5 @@ async def get_username(email):
 
 if __name__ == "__main__":
     import asyncio
-    data = asyncio.run(get_username("test@pixx.co"))
+    data = asyncio.run(get_username("test@spaceship.im"))
     print(data)

@@ -160,7 +160,7 @@ async def get_api(username):
         }
     )
     if data:
-        return data.email_id
+        return {"email"  : data.email_id }
     data = get_email_from_username(username)
     return {"email" : data}
 

@@ -1,2 +1,2 @@
 # bots_api
-bots.pixx.co
+bots.spaceship.im
