@@ -281,3 +281,24 @@ async def agent_duplicate(item: Bots):
         update_yaml(SUPERAGENT_API_URL,
                     workflow["id"], get_agent.api_key, workflow_data.yaml, session)
     return True
+
+@app.post("/gradio/{msg_id}/add")
+async def gradio_add(msg_id, data: []):
+    try:
+        await prisma.gradio.create({
+            "id" : msg_id,
+            "data" : data
+        })
+        return True
+    except Exception as e:
+        return False
+    
+@app.get("/gradio/{msg_id}/get")
+async def gradio_get(msg_id):
+    grad_data = await prisma.gradio.find_first(
+        where={
+            "id" : msg_id
+        }
+    )
+
+    return grad_data
