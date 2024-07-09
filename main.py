@@ -191,6 +191,17 @@ async def bots_check(botlist: BotList):
         result[i.bot_username] = True
     return result
 
+@app.post("/bots/{bot_username}/verify")
+async def bots_verify(bot_username):
+    bots_data = await prisma.bot.find_first(
+        where={
+            "bot_username" : bot_username
+        }
+    )
+    if bots_data:
+        return True
+    return False
+
 
 @app.post("/bots/update")
 async def update_bot(item: AgentUpdate, agent_id):
