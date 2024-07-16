@@ -1,9 +1,13 @@
 import json
 import logging
 import os
+import shutil
+import uuid
 
-from fastapi import FastAPI, HTTPException, Path, Request
+from fastapi import FastAPI, File, HTTPException, Path, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from httpx import AsyncClient
 
 from utils.genUsername import check_username_availability
@@ -18,9 +22,20 @@ from prisma import Prisma
 MATRIX_API_URL = os.environ["MATRIX_URL"]
 SUPERAGENT_API_URL = os.environ["SUPERAGENT_API_URL"]
 
+
 app = FastAPI()
 prisma = Prisma()
 session = AsyncClient(follow_redirects=True)
+app.mount("/static", StaticFiles(directory="uploaded_files"), name="static")
+
+#handle gradio image uploads
+UPLOAD_DIRECTORY = "./uploaded_images"
+
+if not os.path.exists(UPLOAD_DIRECTORY):
+    os.makedirs(UPLOAD_DIRECTORY)
+
+
+#public list as json
 f = open('data.json')
 data = json.load(f)
 
@@ -282,23 +297,37 @@ async def agent_duplicate(item: Bots):
                     workflow["id"], get_agent.api_key, workflow_data.yaml, session)
     return True
 
-@app.post("/gradio/{msg_id}/add")
-async def gradio_add(msg_id, data: []):
-    try:
-        await prisma.gradio.create({
-            "id" : msg_id,
-            "data" : data
-        })
-        return True
-    except Exception as e:
-        return False
+@app.post("/upload_file")
+async def upload_file(file: UploadFile = File(...)):
+    file_id = str(uuid.uuid4())
+    file_location = f"{UPLOAD_DIRECTORY}/{file_id}_{file.filename}"
     
-@app.get("/gradio/{msg_id}/get")
-async def gradio_get(msg_id):
+    with open(file_location, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    file_url = f"https://bots.spaceship.im/static/{file_id}_{file.filename}"
+    return JSONResponse({"url": file_url})
+
+data_store = {}
+
+@app.post("/save_data/{msg_id}")
+async def save_data(msg_id, data: list):
+    grad_output = await prisma.gradio.create(
+        data={
+            "id": msg_id,
+            "data" : data
+        }
+    )
+    if grad_output:
+        return {"success" : True}
+    return {"success" : False}
+
+@app.get("/check_data/{msg_id}")
+async def check_data(msg_id: str):
     grad_data = await prisma.gradio.find_first(
         where={
             "id" : msg_id
         }
     )
-
-    return grad_data
+    if grad_data:
+        return grad_data
+    raise HTTPException(status_code=404, detail="Data not found")
