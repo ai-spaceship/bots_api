@@ -303,7 +303,7 @@ async def upload_file(file: UploadFile = File(...)):
 data_store = {}
 
 @app.post("/save_data/{msg_id}")
-async def save_data(msg_id, data: list):
+async def save_data(msg_id, data):
     grad_output = await prisma.gradio.create(
         data={
             "id": msg_id,
