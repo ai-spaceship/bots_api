@@ -48,5 +48,5 @@ model User {
 
 model gradio {
   id            String @id
-  data          String[]
+  data          Json
 }
