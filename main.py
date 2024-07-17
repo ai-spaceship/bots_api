@@ -28,13 +28,6 @@ prisma = Prisma()
 session = AsyncClient(follow_redirects=True)
 app.mount("/static", StaticFiles(directory="uploaded_files"), name="static")
 
-#handle gradio image uploads
-UPLOAD_DIRECTORY = "./uploaded_images"
-
-if not os.path.exists(UPLOAD_DIRECTORY):
-    os.makedirs(UPLOAD_DIRECTORY)
-
-
 #public list as json
 f = open('data.json')
 data = json.load(f)
@@ -300,7 +293,7 @@ async def agent_duplicate(item: Bots):
 @app.post("/upload_file")
 async def upload_file(file: UploadFile = File(...)):
     file_id = str(uuid.uuid4())
-    file_location = f"{UPLOAD_DIRECTORY}/{file_id}_{file.filename}"
+    file_location = f"uploaded_files/{file_id}_{file.filename}"
     
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
