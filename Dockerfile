@@ -1,6 +1,5 @@
 # 
-FROM python:3.11
-
+FROM python:3.12-alpine
 # 
 WORKDIR /code
 
@@ -9,7 +8,7 @@ COPY ./requirements.txt /code/requirements.txt
 
 #
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir  requests matrix-nio boto3 fastapi gunicorn uvicorn prisma
+RUN pip install --no-cache-dir  requests matrix-nio boto3 fastapi gunicorn uvicorn prisma pillow
 
 # 
 COPY . /code
