@@ -277,17 +277,14 @@ async def agent_duplicate(item: Bots):
                     workflow["id"], get_agent.api_key, workflow_data.yaml, session)
     return True
 
-@app.post("/upload_file/{type}")
-async def upload_file(type=None,file: UploadFile = File(...)):
+@app.post("/upload_file")
+async def upload_file(file: UploadFile = File(...)):
     file_id = str(uuid.uuid4())
-    file_location = f"uploaded_files/{file_id}"
+    file_location = f"uploaded_files/{file_id}_{file.filename}"
     
-    if type == "numpy":
-        img = Image.fromarray(file.file)
-        img.save(file_location)
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    file_url = f"https://bots.spaceship.im/static/{file_id}"
+    file_url = f"https://bots.spaceship.im/static/{file_id}_{file.filename}"
     return JSONResponse({"url": file_url})
 
 data_store = {}
