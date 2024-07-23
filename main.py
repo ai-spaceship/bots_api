@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import uuid
+from PIL import Image
 
 from fastapi import FastAPI, File, HTTPException, Path, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -258,20 +259,6 @@ async def public_list():
     return data
 
 
-@app.post("/workflows/{workflowId}/config")
-async def save_yaml(workflow_id, item: str):
-    await prisma.workflow.upsert(
-        where={
-            "id": workflow_id
-        },
-        data={
-            "create": {
-
-            }
-        }
-    )
-
-
 @app.post('/agent/duplicate/{username}')
 async def agent_duplicate(item: Bots):
     get_agent = await prisma.bot.find_first(
@@ -290,14 +277,17 @@ async def agent_duplicate(item: Bots):
                     workflow["id"], get_agent.api_key, workflow_data.yaml, session)
     return True
 
-@app.post("/upload_file")
-async def upload_file(file: UploadFile = File(...)):
+@app.post("/upload_file/{type}")
+async def upload_file(type=None,file: UploadFile = File(...)):
     file_id = str(uuid.uuid4())
-    file_location = f"uploaded_files/{file_id}_{file.filename}"
+    file_location = f"uploaded_files/{file_id}"
     
+    if type == "numpy":
+        img = Image.fromarray(file.file)
+        img.save(file_location)
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
-    file_url = f"https://bots.spaceship.im/static/{file_id}_{file.filename}"
+    file_url = f"https://bots.spaceship.im/static/{file_id}"
     return JSONResponse({"url": file_url})
 
 data_store = {}
