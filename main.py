@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import shutil
+from typing import Any, Dict
 import uuid
 from PIL import Image
 
@@ -290,7 +291,7 @@ async def upload_file(file: UploadFile = File(...)):
 data_store = {}
 
 @app.post("/save_data/{msg_id}")
-async def save_data(msg_id, data):
+async def save_data(msg_id, data: Dict[Any, Any]):
     grad_output = await prisma.gradio.create(
         data={
             "id": msg_id,
